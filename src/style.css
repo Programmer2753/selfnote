@@ -16,7 +16,7 @@ a, button, span, li, td {
 }
 
 input, label, p, h1, h2, h3, h4, h5, h6 {
-  cursor: url('../assets/images/text_cursor321.png'), auto;
+    cursor: url('../assets/images/text_cursor321.png'), auto;
 }
 
 .button {
@@ -146,7 +146,7 @@ nav a:hover,
     padding: 4px 8px;
     border-radius: 999px;
     background: rgba(0, 0, 0, 0.04);
-    cursor: url("hand_cursor321.png"), auto;
+    cursor: url("../assets/images/hand_cursor321.png"), auto;
     transition: background 0.2s ease;
 }
 
@@ -2957,7 +2957,6 @@ nav a:hover,
 
 .quick-day.other-month {
     color: #555555 !important;
-    cursor: default;
 }
 
 .quick-day.today {

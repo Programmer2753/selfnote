@@ -1082,23 +1082,23 @@ function applyLang(lang) {
 
     menu.innerHTML = `
       <div class="menu-item" onclick="handleRename('${taskId}')">
-        <span class="menu-icon"><img src="rename_icon.png" alt=""></span>
+        <span class="menu-icon"><img src="../assets/images/rename_icon.png" alt=""></span>
         <span class="menu-text">${t.taskActions?.rename || 'Rename'}</span>
       </div>
       
       <div class="menu-item sub-menu-trigger">
-        <span class="menu-icon"><img src="type_icon.png" alt=""></span>
+        <span class="menu-icon"><img src="../assets/images/type_icon.png" alt=""></span>
         <span class="menu-text">${t.taskActions?.taskType || 'Task Type'}</span>
         <span class="arrow-icon">▶</span>
       </div>
       
       <div class="menu-item" onclick="handleDuplicate('${taskId}')">
-        <span class="menu-icon"><img src="duplicate_icon.png" alt=""></span>
+        <span class="menu-icon"><img src="../assets/images/duplicate_icon.png" alt=""></span>
         <span class="menu-text">${t.taskActions?.duplicate || 'Duplicate'}</span>
       </div>
       
       <div class="menu-item delete-item" onclick="handleDelete('${taskId}')">
-        <span class="menu-icon"><img src="delete_icon.png" alt=""></span>
+        <span class="menu-icon"><img src="../assets/images/delete_icon.png" alt=""></span>
         <span class="menu-text">${t.taskActions?.delete || 'Delete'}</span>
       </div>
     `;
@@ -1481,11 +1481,11 @@ function applyLang(lang) {
     cell.dataset.priority = priority;
 
     const map = {
-      urgent: { icon: 'urgent_icon.png', text: 'Urgent' },
-      high:   { icon: 'high_icon.png',   text: 'High' },
-      normal: { icon: 'normal_icon.png', text: 'Normal' },
-      low:    { icon: 'low_icon.png',    text: 'Low' },
-      none:   { icon: 'priority_icon.png', text: '' }
+      urgent: { icon: '../assets/images/urgent_icon.png', text: 'Urgent' },
+      high:   { icon: '../assets/images/high_icon.png',   text: 'High' },
+      normal: { icon: '../assets/images/normal_icon.png', text: 'Normal' },
+      low:    { icon: '../assets/images/low_icon.png',    text: 'Low' },
+      none:   { icon: '../assets/images/priority_icon.png', text: '' }
     };
 
     if (img) img.src = map[priority].icon;
@@ -1548,7 +1548,7 @@ function applyLang(lang) {
                 if (dateStr) {
                     dateBtn.innerHTML = `<span class="date-text">${formatShortDate(dateStr)}</span>`;
                 } else {
-                    dateBtn.innerHTML = `<img src="date_icon.png">`;
+                    dateBtn.innerHTML = `<img src="../assets/images/date_icon.png">`;
                 }
             }
         }
@@ -1575,7 +1575,7 @@ function applyLang(lang) {
 
     const dateHtml = task.date 
         ? `<span class="date-text">${formatShortDate(task.date)}</span>` 
-        : `<img src="date_icon.png">`;
+        : `<img src="../assets/images/date_icon.png">`;
 
     row.innerHTML = `
       <td>
@@ -1587,11 +1587,11 @@ function applyLang(lang) {
       <td class="icon-cell"></td>
       <td class="icon-cell date-btn">${dateHtml}</td>
       <td class="icon-cell priority-btn" data-priority="${task.priority || 'none'}">
-        <img src="priority_icon.png">
+        <img src="../assets/images/priority_icon.png">
         <span class="priority-label"></span>
       </td>
       <td><span class="status ${statusClass(task.status)}">${task.status}</span></td>
-      <td class="icon-cell"><img src="comment_icon.png"></td>
+      <td class="icon-cell"><img src="../assets/images/comment_icon.png"></td>
       <td class="icon-cell">
         <button class="task-menu-btn" style="color: #666; background: none; border: none;">···</button>
       </td>
@@ -2330,11 +2330,11 @@ function applyLang(lang) {
               </div>
 
               <button class="add-task-icon" title="Due date">
-                  <img src="date_icon.png">
+                  <img src="../assets/images/date_icon.png">
               </button>
 
               <div class="priority-btn" data-priority="none">
-                <img src="priority_icon.png">
+                <img src="../assets/images/priority_icon.png">
                 <span class="priority-label"></span>
               </div>
 
@@ -2344,7 +2344,6 @@ function applyLang(lang) {
           </div>
         </td>
       `;
-
       row.querySelector('.task-name-input').focus();
     });
 
@@ -2472,11 +2471,11 @@ function applyLang(lang) {
       menu.className = 'priority-menu';
 
       menu.innerHTML = `
-        <button data-p="urgent"><img src="urgent_icon.png"> Urgent</button>
-        <button data-p="high"><img src="high_icon.png"> High</button>
-        <button data-p="normal"><img src="normal_icon.png"> Normal</button>
-        <button data-p="low"><img src="low_icon.png"> Low</button>
-        <button data-p="none"><img src="clear_icon.png"> Clear</button>
+        <button data-p="urgent"><img src="../assets/images/urgent_icon.png"> Urgent</button>
+        <button data-p="high"><img src="../assets/images/high_icon.png"> High</button>
+        <button data-p="normal"><img src="../assets/images/normal_icon.png"> Normal</button>
+        <button data-p="low"><img src="../assets/images/low_icon.png"> Low</button>
+        <button data-p="none"><img src="../assets/images/clear_icon.png"> Clear</button>
       `;
 
       document.body.appendChild(menu);

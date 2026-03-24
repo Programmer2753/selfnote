@@ -2860,7 +2860,7 @@ nav a:hover,
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: url("hand_cursor321.png"), auto;
+    cursor: url("../assets/images/hand_cursor321.png"), auto;
 }
 
 .ai-send-btn:hover {

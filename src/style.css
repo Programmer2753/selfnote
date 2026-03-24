@@ -2544,7 +2544,7 @@ nav a:hover,
     align-items: center;
     gap: 12px;
     transition: all 0.3s ease;
-    cursor: url('cursor321.png'), pointer;
+    cursor: url('../assets/images/cursor321.png'), pointer;
     color: #e6e6e6;
     font-size: 15px;
 }

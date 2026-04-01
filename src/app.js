@@ -2550,278 +2550,118 @@ function applyLang(lang) {
     });
 
 
-    const aiInput = document.getElementById('aiInput');
-    const aiSendBtn = document.getElementById('aiSendBtn');
+    const aiInput = document.getElementById('message');
+    const aiSendBtn = document.getElementById('send');
     const aiChat = document.getElementById('aiChat');
     let chatContext = JSON.parse(localStorage.getItem('ai_chat_history') || '[]');
     window.chatContext = chatContext;
+
+    let isGenerating = false;
+    let controller;
+    let stopTypewriter = false;
+    let typingTimeoutId = null;
+
+    const SEND_SVG = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 2L11 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    const STOP_SVG = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="6" width="12" height="12" fill="white" stroke="white" stroke-width="2" stroke-linejoin="round"/></svg>`;
+
+    // --- 1. УТИЛИТЫ ДЛЯ UI И АНИМАЦИЙ ---
+
+    function smartScroll() {
+      const threshold = 100;
+      const distanceToBottom = aiChat.scrollHeight - aiChat.scrollTop - aiChat.clientHeight;
+      if (distanceToBottom < threshold) {
+        aiChat.scrollTo({ top: aiChat.scrollHeight, behavior: 'instant' });
+      }
+    }
+
+    function finalize() {
+      isGenerating = false;
+      stopTypewriter = false;
+      if (aiSendBtn) {
+        aiSendBtn.innerHTML = SEND_SVG;
+        aiSendBtn.disabled = false;
+        aiSendBtn.style.backgroundColor = "#007bff"; 
+      }
+    }
+
+    function renderContent(element, text) {
+      if (typeof marked !== 'undefined') {
+        element.innerHTML = marked.parse(text);
+      } else {
+        element.innerHTML = text; 
+      }
+      
+      if (typeof renderMathInElement !== 'undefined') {
+        renderMathInElement(element, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    function typeWriter(text, element, speed = 15) {
+      let i = 0;
+      element.innerHTML = "";
+      if (typingTimeoutId) clearTimeout(typingTimeoutId);
+
+      function type() {
+        if (stopTypewriter) {
+          element.innerHTML += " [Stopped]";
+          finalize();
+          return;
+        }
+
+        if (i < text.length) {
+          element.innerHTML += text.charAt(i);
+          i++;
+          smartScroll();
+          typingTimeoutId = setTimeout(type, speed);
+        } else {
+          renderContent(element, text);
+          finalize();
+        }
+      }
+      type();
+    }
 
     function addAIMessage(message, isUser = false) {
       const messageDiv = document.createElement('div');
       messageDiv.className = `ai-message ${isUser ? 'ai-message-user' : 'ai-message-bot'}`;
       
       messageDiv.innerHTML = `
-        <div class="ai-avatar">${isUser ? '👤' : '🤖'}</div>
-        <div class="ai-bubble">${message}</div>
+        ${!isUser ? `<div class="ai-avatar"><img src="assets/images/logo.png"></div>` : ''}
+        <div class="ai-bubble">${isUser ? message : ''}</div>
       `;
       
+      // Если это ИИ и есть готовый текст (например, приветствие), вставляем сразу
+      if (!isUser && message) {
+        messageDiv.querySelector('.ai-bubble').innerHTML = message;
+      }
+
       aiChat.appendChild(messageDiv);
-      aiChat.scrollTop = aiChat.scrollHeight;
+      setTimeout(() => { aiChat.scrollTop = aiChat.scrollHeight; }, 10);
+
+      return messageDiv.querySelector('.ai-bubble'); // Возвращаем баббл для анимации
     }
 
-    function analyzeTasksAI() {
-      const tasks = [];
-      const rows = document.querySelectorAll('.table tbody tr:not(.group-row):not([class*="add-task"])');
-      
-      rows.forEach(row => {
-        const nameCell = row.querySelector('.name-cell');
-        const statusCell = row.querySelector('.status');
-        const priorityCell = row.querySelectorAll('td')[3];
-        
-        if (nameCell && statusCell) {
-          const taskName = nameCell.textContent.trim();
-          const status = statusCell.textContent.trim();
-          const priority = priorityCell.querySelector('.icon')?.textContent || 'Not set';
-          
-          tasks.push({ name: taskName, status, priority });
-        }
-      });
-
-      return tasks;
-    }
-
-    function generateAIResponse(userMessage) {
-      const lowerMsg = userMessage.toLowerCase().trim();
-      const currentLang = localStorage.getItem('site_lang') || 'en';
-      const t = i18n[currentLang];
-      
-      const hasWords = (words) => words.some(word => lowerMsg.includes(word));
-      
-      if (hasWords(['проанал', 'анал', 'завдан', 'analyze', 'task', 'статус', 'скільки'])) {
-        const tasks = analyzeTasksAI();
-        
-        if (tasks.length === 0) {
-          return `<p>${t.ai?.noTasks || 'No tasks yet'}</p>`;
-        }
-
-        const inProgress = tasks.filter(task => task.status === 'IN PROGRESS').length;
-        const todo = tasks.filter(task => task.status === 'TO DO').length;
-        const done = tasks.filter(task => task.status === 'DONE').length;
-        
-        let response = `<p><strong>${t.ai?.taskAnalysis || '📊 Task Analysis:'}</strong></p>`;
-        response += `<ul>`;
-        response += `<li>${t.ai?.totalTasks || '📋 Total tasks:'} <strong>${tasks.length}</strong></li>`;
-        response += `<li>${t.ai?.inProgress || '🔄 In progress:'} <strong>${inProgress}</strong></li>`;
-        response += `<li>${t.ai?.planned || '📝 Planned:'} <strong>${todo}</strong></li>`;
-        response += `<li>${t.ai?.completed || '✅ Completed:'} <strong>${done}</strong></li>`;
-        response += `</ul>`;
-        
-        response += `<p><strong>${t.ai?.recommendations || '💡 Recommendations:'}</strong></p><ul>`;
-        
-        if (inProgress > 3) {
-          response += `<li>${t.ai?.manyInProgress || 'Many tasks in progress'} (${inProgress}). ${t.ai?.focusRecommendation || 'Focus on important tasks.'}</li>`;
-        }
-        
-        if (todo > 5) {
-          response += `<li>${t.ai?.setPriorities || 'Set priorities for'} ${todo} ${t.ai?.tasks || 'tasks.'}</li>`;
-        }
-        
-        if (tasks.length > 0) {
-          response += `<li>${t.ai?.startWithImportant || 'Start with important task'}</li>`;
-          response += `<li>${t.ai?.setReminders || 'Set reminders'}</li>`;
-          response += `<li>${t.ai?.markCompleted || 'Mark completed tasks!'}</li>`;
-        }
-        
-        response += `</ul>`;
-        
-        return response;
-      }
-
-      if (hasWords(['прив', 'даро', 'хай', 'hello', 'hi', 'yo'])) {
-        return `<p>${t.ai?.greeting || '👋 Hello!'}</p>
-                <p>${t.ai?.howCanHelp || 'How can I help? 😊'}</p>`;
-      }
-      
-      if (hasWords(['ок', 'fine', 'nice', 'okay', 'пон', 'добре', 'чудово', 'круто', 'зрозумі', 'ясно'])) {
-        return `<p>${t.ai?.great || '👌 Great!'}</p>`;
-      }
-
-      if (hasWords(['дякую', 'благодар', 'спасиб', 'спс', 'thanks', 'thx'])) {
-        return `<p>${t.ai?.happyToHelp || '😊 Always happy to help!'}</p>`;
-      }
-
-      if (hasWords(['нічого', 'пока', 'ничего', 'поки', 'пот', 'не треба'])) {
-        return `<p>${t.ai?.imHere || '👌 Okay, I\'m here if you need me.'}</p>`;
-      }
-
-      if (hasWords(['ахах', 'лол', 'хех', '😂', 'хаха'])) {
-        return `<p>${t.ai?.gladYouLiked || '😄 Glad you liked it!'}</p>`;
-      }
-
-      if (hasWords(['хто ти', 'що ти', 'ти хто', 'who', 'what', 'ты'])) {
-        return `<p>${t.ai?.iAmAssistant || '🤖 I\'m an AI assistant that helps:'}</p>
-                <ul>
-                  <li>${t.ai?.planDay2 || '⏰ plan your day'}</li>
-                  <li>${t.ai?.setPriorities2 || '🎯 set priorities'}</li>
-                  <li>${t.ai?.workProductively || '📊 work more productively'}</li>
-                </ul>`;
-      }
-
-      if (hasWords(['розподіли', 'план', 'schedule', 'розклад', 'день', 'час', 'time', 'day'])) {
-        return `
-                <p><strong>${t.ai.dayPlanTitle}</strong></p>
-                <ul>
-                  <li>🌅 <strong>09:00–11:00</strong> — ${t.ai.dayPlanHard}</li>
-                  <li>☕ <strong>11:00–13:00</strong> — ${t.ai.dayPlanMedium}</li>
-                  <li>🍽️ <strong>13:00–14:00</strong> — ${t.ai.dayPlanBreak}</li>
-                  <li>📞 <strong>14:00–16:00</strong> — ${t.ai.dayPlanMeetings}</li>
-                  <li>📝 <strong>16:00–18:00</strong> — ${t.ai.dayPlanLight}</li>
-                </ul>
-                <p><strong>${t.ai.pomodoroTitle}</strong></p>
-                <ul>
-                  <li>🍅 ${t.ai.pomodoroWork}</li>
-                  <li>☕ ${t.ai.pomodoroRest}</li>
-                  <li>🎯 ${t.ai.pomodoroLong}</li>
-                </ul>`;
-      }
-      
-      if (hasWords(['пріоритет', 'важлив', 'priority', 'терміно', ' important'])) {
-        return `
-                <p><strong>${t.ai.priorityTitle}</strong></p>
-                <ul>
-                  <li>🔴 <strong>${t.ai.priorityUrgent}</strong> — ${t.ai.priorityUrgentDesc}</li>
-                  <li>🟠 <strong>${t.ai.priorityHigh}</strong> — ${t.ai.priorityHighDesc}</li>
-                  <li>🟡 <strong>${t.ai.priorityMedium}</strong> — ${t.ai.priorityMediumDesc}</li>
-                  <li>🟢 <strong>${t.ai.priorityLow}</strong> — ${t.ai.priorityLowDesc}</li>
-                </ul>
-                <p><strong>${t.ai.eisenhowerTitle}</strong></p>
-                <ul>
-                  <li>${t.ai.eisenhower1}</li>
-                  <li>${t.ai.eisenhower2}</li>
-                  <li>${t.ai.eisenhower3}</li>
-                  <li>${t.ai.eisenhower4}</li>
-                </ul>
-                <p>${t.ai.priorityHint}</p>`;
-      }
-      
-      if (hasWords(['допомога', 'help', 'що ти', 'команд', 'можеш', 'can', 'command'])) {
-        return `
-                <p><strong>${t.ai.helpTitle}</strong></p>
-                <ul>
-                  <li>📊 <strong>${t.ai.helpAnalyze}</strong> — "${t.ai.helpAnalyzeCmd}"</li>
-                  <li>⏰ <strong>${t.ai.helpPlan}</strong> — "${t.ai.helpPlanCmd}"</li>
-                  <li>🎯 <strong>${t.ai.helpPriority}</strong> — "${t.ai.helpPriorityCmd}"</li>
-                  <li>💡 <strong>${t.ai.helpTips}</strong> — "${t.ai.helpTipsCmd}"</li>
-                </ul>
-                <p><strong>${t.ai.helpExamples}</strong></p>
-                <ul>
-                  <li>"${t.ai.exampleAnalyze}"</li>
-                  <li>"${t.ai.examplePlan}"</li>
-                  <li>"${t.ai.examplePriority}"</li>
-                  <li>"${t.ai.exampleTips}"</li>
-                </ul>
-                <p>${t.ai.helpFooter}</p>
-        `;
-      }
-      
-      if (hasWords(['prod', 'effect', 'advice', 'совет', 'порад', 'продуктивніст', 'ефективн', 'productivity'])) {
-        return `
-                <p><strong>${t.ai.productivityTitle}</strong></p>
-                <ul>
-                  <li>🎯 ${t.ai.rule2min}</li>
-                  <li>🐸 ${t.ai.eatFrog}</li>
-                  <li>📝 ${t.ai.batchTasks}</li>
-                  <li>🚫 ${t.ai.noMultitasking}</li>
-                  <li>⏰ ${t.ai.timeBlocking}</li>
-                  <li>📱 ${t.ai.noDistractions}</li>
-                  <li>🎉 ${t.ai.rewardYourself}</li>
-                </ul>`;
-      }
-      
-      return `<p>${t.ai?.goodQuestion || '🤔 Good question! Here\'s what I can do for you:'}</p>
-              <ul>
-                <li>${t.ai?.analyzeCommand || '💬 "Analyze my tasks" - show statistics'}</li>
-                <li>${t.ai?.planDay || '⏰ "Plan the day" - create schedule'}</li>
-                <li>${t.ai?.howToPrioritize || '🎯 "How to prioritize" - explain system'}</li>
-                <li>${t.ai?.giveTips || '💡 "Give tips" - share productivity hacks'}</li>
-                <li>${t.ai?.helpCommand || '❓ "Help" - show all commands'}</li>
-              </ul>
-              <p>${t.ai?.justAsk || 'Just write the command in your own words! 😊'}</p>`;
-    }
-
-    async function sendAIMessage() {
-      const message = aiInput.value.trim();
-      if (!message) return;
-
-      addAIMessage(message, true);
-      aiInput.value = '';
-      chatContext.push({ role: "user", content: message });
-
-      const allUsers = JSON.parse(localStorage.getItem('users') || '[]');
-      const currentUserEmail = localStorage.getItem('currentUser');
-      let userTasks = [];
-
-      if (currentUserEmail) {
-        const currentUser = allUsers.find(u => u.email === currentUserEmail);
-        if (currentUser && currentUser.tasks) {
-          userTasks = currentUser.tasks.map(t => 
-          typeof t === 'object' ? (t.name || t.text || JSON.stringify(t)) : t
-          );
-        }
-      }
-
-      try {
-        const response = await fetch('/api/ai_chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: message, history: chatContext, notes: userTasks })
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error("Server Error:", errorData);
-          addAIMessage("Error on server. Check console.", false);
-          return;
-        };
-
-        const data = await response.json();
-        addAIMessage(data.answer, false);
-        chatContext.push({ role: "assistant", content: data.answer });
-        if (chatContext.length > 10) chatContext.shift();
-        localStorage.setItem('ai_chat_history', JSON.stringify(chatContext));
-
-      } catch (err) {
-        console.error("Request error:", err);
-        addAIMessage("Unable to connect to the AI.", false);
-      }
-    }
-    
-
-    if (aiSendBtn) {
-      aiSendBtn.addEventListener('click', sendAIMessage);
-    }
-
-    if (aiInput) {
-      aiInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          sendAIMessage();
-        }
-      });
-    }
+    // --- 2. ФУНКЦИЯ ПРИВЕТСТВИЯ ---
 
     function initAIGreeting() {
-      const aiChat = document.getElementById('aiChat');
       if (!aiChat) return;
 
       const savedLang = localStorage.getItem('site_lang');
-      const currentLang = i18n[savedLang] ? savedLang : 'en';
-      const t = i18n[currentLang];
+      const currentLang = typeof i18n !== 'undefined' && i18n[savedLang] ? savedLang : 'en';
+      const t = typeof i18n !== 'undefined' ? i18n[currentLang] : {};
 
       if (!t.ai) {
-        console.warn(`Переводы для AI (язык: ${currentLang}) не найдены.`);
+        console.warn(`Translations for AI (language: ${currentLang}) not found.`);
         return; 
       }
 
+      // Не выводим приветствие, если в чате уже что-то есть (например, загрузилась история)
       if (aiChat.children.length > 0) return;
 
       const greeting = `
@@ -2837,6 +2677,126 @@ function applyLang(lang) {
       `;
 
       addAIMessage(greeting, false);
+    }
+
+    // --- 3. ГЛАВНАЯ ФУНКЦИЯ ОБЩЕНИЯ С СЕРВЕРОМ ---
+
+    async function sendAIMessage() {
+      // Прерывание текущей генерации, если нажата кнопка "Стоп"
+      if (isGenerating) {
+        if (controller) controller.abort();
+        stopTypewriter = true;
+        finalize(); 
+        return;
+      }
+
+      const message = aiInput.value.trim();
+      if (!message) return;
+
+      // 1. Отображаем сообщение юзера
+      addAIMessage(message, true);
+      aiInput.value = '';
+      aiInput.style.height = '45px';
+      chatContext.push({ role: "user", content: message });
+
+      // 2. Включаем состояние загрузки
+      isGenerating = true;
+      if (aiSendBtn) {
+        aiSendBtn.innerHTML = STOP_SVG;
+        aiSendBtn.style.backgroundColor = "#ff4d4d"; 
+      }
+      controller = new AbortController();
+
+      // Добавляем пустой баббл с индикатором "Думает..."
+      const aiBubbleElement = addAIMessage(
+        '<div class="typing-indicator" id="current-loader"><span></span><span></span><span></span><span class="thinking-text" id="thinking-status">SelfNote thinking...</span></div>', 
+        false
+      );
+
+      let statusInterval;
+      const statuses = ["Analyzing prompt...", "Looking for logical connections...", "Generating a reply..."];
+      let statusIdx = 0;
+      statusInterval = setInterval(() => {
+        const statusEl = document.getElementById('thinking-status');
+        if (statusEl) {
+          statusEl.innerText = statuses[statusIdx % statuses.length];
+          statusIdx++;
+        }
+      }, 2000);
+
+      // 3. Собираем данные для контекста ИИ
+      const allUsers = JSON.parse(localStorage.getItem('users') || '[]');
+      const currentUserEmail = localStorage.getItem('currentUser');
+      let userTasks = [];
+      if (currentUserEmail) {
+        const currentUser = allUsers.find(u => u.email === currentUserEmail);
+        if (currentUser && currentUser.tasks) {
+          userTasks = currentUser.tasks.map(t => 
+            typeof t === 'object' ? (t.name || t.text || JSON.stringify(t)) : t
+          );
+        }
+      }
+
+      // 4. Отправляем запрос на сервер
+      try {
+        const response = await fetch('/api/ai_chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: message, history: chatContext, notes: userTasks }),
+          signal: controller.signal
+        });
+
+        if (!response.ok) throw new Error("Server error");
+
+        const data = await response.json();
+        clearInterval(statusInterval);
+
+        // 5. Выводим ответ с эффектом печати
+        if (!stopTypewriter) {
+          chatContext.push({ role: "assistant", content: data.answer });
+          if (chatContext.length > 10) chatContext.shift();
+          localStorage.setItem('ai_chat_history', JSON.stringify(chatContext));
+          
+          typeWriter(data.answer.trim(), aiBubbleElement);
+        }
+
+      } catch (err) {
+        clearInterval(statusInterval);
+        if (err.name === 'AbortError') {
+          aiBubbleElement.innerText = "Generation stopped.";
+        } else {
+          console.error("Request error:", err);
+          aiBubbleElement.innerText = "Unable to connect to the AI.";
+        }
+        finalize();
+      }
+    }
+
+    // --- 4. СЛУШАТЕЛИ СОБЫТИЙ И ИНИЦИАЛИЗАЦИЯ ---
+
+    if (aiSendBtn) {
+      aiSendBtn.addEventListener('click', sendAIMessage);
+    }
+
+    if (aiInput) {
+      aiInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        const newHeight = Math.min(this.scrollHeight, 150);
+        this.style.height = newHeight + 'px';
+        smartScroll();
+      });
+
+      aiInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendAIMessage();
+        }
+      });
+    }
+
+    // Запускаем приветствие, если история чата пустая
+    if (chatContext.length === 0) {
+      initAIGreeting();
     }
 
     function updateDashboardStats() {

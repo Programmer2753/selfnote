@@ -6,6 +6,10 @@
         <meta name='viewport' content='width=device-width, initial-scale=1.0'>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
         <link rel="stylesheet" href="src/style.css">
         <link rel="icon" type="image/png" href="assets/images/main_logo.png">
         <title>SelfNote: Write your day</title>
@@ -731,17 +735,18 @@
                 <div class="ai-chat" id="aiChat">
                 </div>
 
-                <div class="ai-input-container">
-                    <input 
-                        type="text" 
-                        id="aiInput" 
-                        class="ai-input" 
-                        placeholder="Ask SelfNote..."
-                    />
-                    <button id="aiSendBtn" class="ai-send-btn">
-                        <span>→</span>
-                    </button>
+                <div class="animated-border-wrapper">
+                    <div class="input">
+                        <textarea id="message" placeholder="Ask SelfNote..." autocomplete="off" rows="1"></textarea>
+                        <button id="send">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22 2L11 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
+                <div class="disclaimer">SelfNote AI may make mistakes. Please check important information.</div>
             </div>
 
         </div>

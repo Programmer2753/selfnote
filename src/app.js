@@ -59,7 +59,8 @@ const i18n = {
       productivity: "Productivity",
       myProfile: "My Profile",
       ukrainian: "Ukrainian",
-      english: "English"
+      english: "English",
+      russian: "Русский"
     },
 
     about: {
@@ -154,6 +155,9 @@ const i18n = {
     },
 
     ai: {
+      subtitle: "I can help you organize your tasks and plan your day",
+      placeholder: "Ask SelfNote...",
+      disclaimer: "SelfNote AI may make mistakes. Please check important information.",
       intro: "👋 Hello! I'm your AI task planning assistant.",
       introHelp: "I can help you with:",
       introAnalyze: "Analyze your tasks",
@@ -312,7 +316,8 @@ const i18n = {
       productivity: "Продуктивність",
       myProfile: "Мій профіль",
       ukrainian: "Українська",
-      english: "English"
+      english: "English",
+      russian: "Русский"
     },
 
     about: {
@@ -407,6 +412,9 @@ const i18n = {
     },
 
     ai: {
+      subtitle: "Я можу допомогти вам упорядкувати ваші справи та спланувати ваш день",
+      placeholder: "Запитайте SelfNote...",
+      disclaimer: "SelfNote AI може припускатися помилок. Будь ласка, перевіряйте важливу інформацію.",
       intro: "Привіт! Я AI асистент для планування завдань.",
       introHelp: "Я можу допомогти вам:",
       introAnalyze: "Проаналізувати ваші завдання",
@@ -509,8 +517,8 @@ const i18n = {
       completed: "Завершено",
       productivity: "Продуктивность",
       myProfile: "Мой профиль",
-      ukrainian: "Украинский",
-      english: "Английский",
+      ukrainian: "Українська",
+      english: "English",
       russian: "Русский"
     },
 
@@ -606,6 +614,9 @@ const i18n = {
     },
 
     ai: {
+      subtitle: "Я могу помочь вам систематизировать задачи и спланировать ваш день",
+      placeholder: "Спросите SelfNote...",
+      disclaimer: "SelfNote AI может допускать ошибки. Пожалуйста, проверяйте важную информацию.",
       intro: "Привет! Я AI ассистент для планирования задач.",
       introHelp: "Я могу помочь вам:",
       introAnalyze: "Проанализировать ваши задачи",
@@ -697,6 +708,11 @@ function applyFullLanguage(lang) {
   setTextSafe('.about-intro-title', t.about?.introTitle);
   setTextSafe('.about-intro-p1', t.about?.introP1);
   setTextSafe('.about-intro-p2', t.about?.introP2);
+
+  // ===== AI PAGE =====
+  setTextSafe('.ai-subtitle', t.ai?.subtitle);
+  setPlaceholderSafe('#message', t.ai?.placeholder || 'Ask SelfNote...');
+  setTextSafe('.disclaimer', t.ai?.disclaimer || 'SelfNote AI may make mistakes. Please check important information.');
 
   const preTextLog = document.querySelector('.pre-link-text-log');
   if (preTextLog) preTextLog.textContent = t.noAccount;
@@ -1867,8 +1883,7 @@ function applyLang(lang) {
       const user = getCurrentUserData();
       const currentLang =
         user?.profile?.language ||
-        localStorage.getItem('site_lang') ||
-        'en';
+        localStorage.getItem('site_lang') || 'en';
 
       const t = i18n[currentLang];
 
@@ -1890,7 +1905,7 @@ function applyLang(lang) {
 
         if (!langName) return;
 
-        if (lang === 'ua' || lang === 'uk') {
+        if (lang === 'ua') {
           langName.textContent = t.profile?.ukrainian || 'Українська';
         } else if (lang === 'en') {
           langName.textContent = t.profile?.english || 'English';
@@ -2564,8 +2579,6 @@ function applyLang(lang) {
     const SEND_SVG = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 2L11 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
     const STOP_SVG = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="6" width="12" height="12" fill="white" stroke="white" stroke-width="2" stroke-linejoin="round"/></svg>`;
 
-    // --- 1. УТИЛИТЫ ДЛЯ UI И АНИМАЦИЙ ---
-
     function smartScroll() {
       const threshold = 100;
       const distanceToBottom = aiChat.scrollHeight - aiChat.scrollTop - aiChat.clientHeight;
@@ -2636,7 +2649,6 @@ function applyLang(lang) {
         <div class="ai-bubble">${isUser ? message : ''}</div>
       `;
       
-      // Если это ИИ и есть готовый текст (например, приветствие), вставляем сразу
       if (!isUser && message) {
         messageDiv.querySelector('.ai-bubble').innerHTML = message;
       }
@@ -2644,10 +2656,8 @@ function applyLang(lang) {
       aiChat.appendChild(messageDiv);
       setTimeout(() => { aiChat.scrollTop = aiChat.scrollHeight; }, 10);
 
-      return messageDiv.querySelector('.ai-bubble'); // Возвращаем баббл для анимации
+      return messageDiv.querySelector('.ai-bubble');
     }
-
-    // --- 2. ФУНКЦИЯ ПРИВЕТСТВИЯ ---
 
     function initAIGreeting() {
       if (!aiChat) return;
@@ -2661,7 +2671,6 @@ function applyLang(lang) {
         return; 
       }
 
-      // Не выводим приветствие, если в чате уже что-то есть (например, загрузилась история)
       if (aiChat.children.length > 0) return;
 
       const greeting = `
@@ -2679,10 +2688,8 @@ function applyLang(lang) {
       addAIMessage(greeting, false);
     }
 
-    // --- 3. ГЛАВНАЯ ФУНКЦИЯ ОБЩЕНИЯ С СЕРВЕРОМ ---
 
     async function sendAIMessage() {
-      // Прерывание текущей генерации, если нажата кнопка "Стоп"
       if (isGenerating) {
         if (controller) controller.abort();
         stopTypewriter = true;
@@ -2693,13 +2700,11 @@ function applyLang(lang) {
       const message = aiInput.value.trim();
       if (!message) return;
 
-      // 1. Отображаем сообщение юзера
       addAIMessage(message, true);
       aiInput.value = '';
       aiInput.style.height = '45px';
       chatContext.push({ role: "user", content: message });
 
-      // 2. Включаем состояние загрузки
       isGenerating = true;
       if (aiSendBtn) {
         aiSendBtn.innerHTML = STOP_SVG;
@@ -2707,7 +2712,6 @@ function applyLang(lang) {
       }
       controller = new AbortController();
 
-      // Добавляем пустой баббл с индикатором "Думает..."
       const aiBubbleElement = addAIMessage(
         '<div class="typing-indicator" id="current-loader"><span></span><span></span><span></span><span class="thinking-text" id="thinking-status">SelfNote thinking...</span></div>', 
         false
@@ -2724,7 +2728,6 @@ function applyLang(lang) {
         }
       }, 2000);
 
-      // 3. Собираем данные для контекста ИИ
       const allUsers = JSON.parse(localStorage.getItem('users') || '[]');
       const currentUserEmail = localStorage.getItem('currentUser');
       let userTasks = [];
@@ -2737,7 +2740,6 @@ function applyLang(lang) {
         }
       }
 
-      // 4. Отправляем запрос на сервер
       try {
         const response = await fetch('/api/ai_chat', {
           method: 'POST',
@@ -2751,7 +2753,6 @@ function applyLang(lang) {
         const data = await response.json();
         clearInterval(statusInterval);
 
-        // 5. Выводим ответ с эффектом печати
         if (!stopTypewriter) {
           chatContext.push({ role: "assistant", content: data.answer });
           if (chatContext.length > 10) chatContext.shift();
@@ -2772,7 +2773,6 @@ function applyLang(lang) {
       }
     }
 
-    // --- 4. СЛУШАТЕЛИ СОБЫТИЙ И ИНИЦИАЛИЗАЦИЯ ---
 
     if (aiSendBtn) {
       aiSendBtn.addEventListener('click', sendAIMessage);
@@ -2794,7 +2794,6 @@ function applyLang(lang) {
       });
     }
 
-    // Запускаем приветствие, если история чата пустая
     if (chatContext.length === 0) {
       initAIGreeting();
     }

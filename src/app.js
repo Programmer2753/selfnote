@@ -562,7 +562,7 @@ const i18n = {
     statuses: {
       done: "ГОТОВО",
       inProgress: "В ПРОЦЕССЕ",
-      todo: "К СДЕЛАТЬ"
+      todo: "СДЕЛАТЬ"
     },
 
     taskActions: {
@@ -584,7 +584,7 @@ const i18n = {
       progressTitle: "Прогресс задач",
       prioritiesTitle: "Приоритеты",
       recentTitle: "Последние задачи",
-      todoStatus: "К СДЕЛАТЬ",
+      todoStatus: "СДЕЛАТЬ",
       inProgressStatus: "В ПРОЦЕССЕ",
       doneStatus: "ГОТОВО",
       noTasksYet: "Задач пока нет. Создайте первую!",

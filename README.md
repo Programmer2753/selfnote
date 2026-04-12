@@ -1,4 +1,4 @@
-# <img src="assets/images/logo.png" width="36"> SelfNote
+# <img src="assets/images/logo.png" width="32"> SelfNote
 
 > **SelfNote** — is an ultra-convenient note and task manager designed to make your day-to-day interaction with information easier, faster, and more engaging.
 
@@ -44,5 +44,5 @@ Your feedback is incredibly important for the evolution of SelfNote! If you have
 
 ## 🔗 Links
 
-* <img src="assets/images/logo.png" width="36"> [Website](https://selfnote-prod.vercel.app) — link to the latest version
-* <img src="assets/images/tg_logo.png" width="36"> [Telegram Channel](https://t.me/selfnoteai) — stay updated and suggest new features
+* <img src="assets/images/logo.png" width="18"> [Website](https://selfnote-prod.vercel.app) — link to the latest version
+* <img src="assets/images/tg_logo.png" width="18"> [Telegram Channel](https://t.me/selfnoteai) — stay updated and suggest new features

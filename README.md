@@ -1,4 +1,4 @@
-# <img src="assets/images/logo.png" width="35"> SelfNote
+# <img src="assets/images/logo.png" width="36"> SelfNote
 
 > **SelfNote** — is an ultra-convenient note and task manager designed to make your day-to-day interaction with information easier, faster, and more engaging.
 
@@ -9,7 +9,6 @@
 At present, SelfNote can:
 
 * 🗂️ **Universal Organizer**: Keep all your thoughts, ideas, and structured notes in one accessible place.
-* ![Dashboard Preview](assets/dashboard_preview.png)
 * ✅ **Task Management**: Seamlessly create and track your daily tasks to stay productive.
 * 🤖 **Integrated AI Chat**: A built-in intelligent assistant that helps you brainstorm, summarize notes, or answer questions on the fly.
 * 🎨 **Premium UI/UX**: Designed with a focus on modern aesthetics and a smooth user experience.
@@ -45,5 +44,5 @@ Your feedback is incredibly important for the evolution of SelfNote! If you have
 
 ## 🔗 Links
 
-* 🌐 [Website](https://selfnote-prod.vercel.app) — link to the latest version
-* 💬 [Telegram Channel](https://t.me/selfnoteai) — stay updated and suggest new features
+* <img src="assets/images/logo.png" width="36"> [Website](https://selfnote-prod.vercel.app) — link to the latest version
+* <img src="assets/images/tg_logo.png" width="36"> [Telegram Channel](https://t.me/selfnoteai) — stay updated and suggest new features

@@ -4,14 +4,39 @@
 
 ---
 
+## 🆕 What's New: v1.2
+
+### 🚀 Key Updates
+* **Calendar View**: added a full calendar view of tasks for convenient long-term planning.
+* **UI/UX Refinement**: updated sidebar icons and added customizable interactive cursors for a more engaging experience.
+
+### 🛠 Improvements and Fixes
+* **AI**: increased the speed of processing requests in the built-in chat.
+* **Bug fixes**: fixed an issue with saving task statuses after reloading the page.
+
+---
+
 ## ✨ Key features
 
 At present, SelfNote can:
 
 * 🗂️ **Universal Organizer**: Keep all your thoughts, ideas, and structured notes in one accessible place.
-* ✅ **Task Management**: Seamlessly create and track your daily tasks to stay productive.
+## ✨ Key features
+
+* ✅ **Task Management**: Seamlessly create and track your daily tasks. Organize your workflow with categories like "To Do", "In Progress", and "Done".
+![Task List Preview](list_preview.png)
+
+* 📅 **Visual Planning**: Stay ahead of your schedule with the integrated calendar view. Track deadlines and plan your month at a glance.
+![Calendar Preview](calendar_preview.png)
+
+* 📊 **Analytics Dashboard**: Get a high-level overview of your productivity. Track task progress, priorities, and overall efficiency in real-time.
+![Dashboard Preview](dashboard_preview.png)
+
 * 🤖 **Integrated AI Chat**: A built-in intelligent assistant that helps you brainstorm, summarize notes, or answer questions on the fly.
-* 🎨 **Premium UI/UX**: Designed with a focus on modern aesthetics and a smooth user experience.
+![Ai Preview](ai_preview.png)
+
+* 🎨 **Premium UI/UX**: Designed with a focus on modern aesthetics, utilizing a dark theme and clean layouts for a superior user experience.
+
 * ⚡ **High Performance**: Optimized for speed to ensure your workflow remains uninterrupted.
 
 ---

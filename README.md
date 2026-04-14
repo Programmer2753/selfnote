@@ -42,7 +42,6 @@ At present, SelfNote can:
 
 ## 🛠 Project status
 
-| Parameter | Value |
 | :--- | :--- |
 | **Version** | v1.2 |
 | **Access** | Free |

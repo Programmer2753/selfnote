@@ -21,7 +21,6 @@
 At present, SelfNote can:
 
 * 🗂️ **Universal Organizer**: Keep all your thoughts, ideas, and structured notes in one accessible place.
-## ✨ Key features
 
 * ✅ **Task Management**: Seamlessly create and track your daily tasks. Organize your workflow with categories like "To Do", "In Progress", and "Done".
 ![Task List Preview](list_preview.png)

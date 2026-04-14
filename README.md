@@ -23,16 +23,16 @@ At present, SelfNote can:
 * 🗂️ **Universal Organizer**: Keep all your thoughts, ideas, and structured notes in one accessible place.
 
 * ✅ **Task Management**: Seamlessly create and track your daily tasks. Organize your workflow with categories like "To Do", "In Progress", and "Done".
-![Task List Preview](list_preview.png)
+![Task List Preview](assets/images/list_preview.png)
 
 * 📅 **Visual Planning**: Stay ahead of your schedule with the integrated calendar view. Track deadlines and plan your month at a glance.
-![Calendar Preview](calendar_preview.png)
+![Calendar Preview](assets/images/calendar_preview.png)
 
 * 📊 **Analytics Dashboard**: Get a high-level overview of your productivity. Track task progress, priorities, and overall efficiency in real-time.
-![Dashboard Preview](dashboard_preview.png)
+![Dashboard Preview](assets/images/dashboard_preview.png)
 
 * 🤖 **Integrated AI Chat**: A built-in intelligent assistant that helps you brainstorm, summarize notes, or answer questions on the fly.
-![Ai Preview](ai_preview.png)
+![Ai Preview](assets/images/ai_preview.png)
 
 * 🎨 **Premium UI/UX**: Designed with a focus on modern aesthetics, utilizing a dark theme and clean layouts for a superior user experience.
 

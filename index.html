@@ -292,9 +292,9 @@
                         </button>
 
                         <ul class="lang-dropdown">
-                                <li data-lang="en">English</li>
-                                <li data-lang="ua">Українська</li>
-                                <li data-lang="ru">Русский</li>
+                            <li data-lang="en">English</li>
+                            <li data-lang="ua">Українська</li>
+                            <li data-lang="ru">Русский</li>
                         </ul>
                     </div>
 
@@ -342,48 +342,48 @@
                 <div class="sidebar-top">
                     <div id="home" class="sidebar-item active">
                         <div class="icon"><img src="assets/images/home_icon.png" alt="Home"></div>
-                        <span>Home</span>
+                        <span id="homeLabel">Home</span>
                     </div>
 
-                    <div id="planner" class="sidebar-item">
+                    <div id="planner" class="sidebar-item" style="display: none;">
                         <div class="icon"><img src="assets/images/planner_icon.png" alt="Planner"></div>
-                        <span>Planner</span>
+                        <span id="plannerLabel">Planner</span>
                     </div>
 
                     <div id="ai" class="sidebar-item">
                         <div class="icon badge"><img src="assets/images/bwailogo.png" alt="AI">
                             <span class="dot"></span>
                         </div>
-                        <span>AI</span>
+                        <span id="aiLabel">AI</span>
                     </div>
 
-                    <div id="teams" class="sidebar-item">
+                    <div id="teams" class="sidebar-item" style="display: none;">
                         <div class="icon"><img src="assets/images/teams_icon.png" alt="Teams"></div>
-                        <span>Teams</span>
+                        <span id="teamsLabel">Teams</span>
                     </div>
 
-                    <div id="dashboard" class="sidebar-item">
+                    <div id="dashboard" class="sidebar-item" style="display: none;">
                         <div class="icon"><img src="assets/images/dash_icon.png" alt="Dashboard"></div>
-                        <span>Dashboard</span>
+                        <span id="dashboardLabel">Dashboard</span>
                     </div>
 
-                    <div class="sidebar-item">
+                    <div class="sidebar-item" style="display: none;">
                         <div class="icon">⋮⋮</div>
-                        <span>More</span>
+                        <span id="moreLabel">More</span>
                     </div>
 
                 </div>
 
                 <div class="sidebar-bottom">
 
-                    <div class="sidebar-item">
+                    <div class="sidebar-item" style="display: none;">
                         <div class="icon"><img src="assets/images/invite_icon.png" alt="Invite"></div>
-                        <span>Invite</span>
+                        <span id="inviteLabel">Invite</span>
                     </div>
 
-                    <div class="sidebar-item upgrade">
+                    <div class="sidebar-item upgrade" style="display: none;">
                         <div class="icon"><img src="assets/images/upgrade_icon.png" alt="Upgrade"></div>
-                        <span>Upgrade</span>
+                        <span id="upgradeLabel">Upgrade</span>
                     </div>
 
                 </div>
@@ -393,7 +393,7 @@
             <div class="main-window">
 
                 <div class="topbar">
-                    <div class="breadcrumbs">
+                    <div class="breadcrumbs" id="breadcrumbs">
                         Home
                     </div>
                     

@@ -4,15 +4,13 @@
 
 ---
 
-## 🆕 What's New: v1.2
+## 🆕 What's New: v1.3
 
 ### 🚀 Key Updates
-* **Calendar View**: added a full calendar view of tasks for convenient long-term planning.
-* **UI/UX Refinement**: updated sidebar icons and added customizable interactive cursors for a more engaging experience.
+* **UI/UX Refinement**: updated sidebar for a more engaging experience.
 
 ### 🛠 Improvements and Fixes
-* **AI**: increased the speed of processing requests in the built-in chat.
-* **Bug fixes**: fixed an issue with saving task statuses after reloading the page.
+* **Bug fixes**: troubleshooting translation issues and minor changes.
 
 ---
 

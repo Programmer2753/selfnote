@@ -1573,7 +1573,7 @@ nav a:hover,
 }
 
 .sidebar-item span {
-    font-size: 11px;
+    font-size: 9px;
 }
 
 .sidebar-item:hover {
@@ -1600,7 +1600,7 @@ nav a:hover,
 }
 
 .sidebar-item.active .icon {
-    background: radial-gradient(circle at center, #6c6c6c, #000000);
+    background: radial-gradient(circle at center, #515151, #000000);
 }
 
 .sidebar-item:hover .icon img {

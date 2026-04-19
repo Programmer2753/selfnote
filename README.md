@@ -42,7 +42,7 @@ At present, SelfNote can:
 
 | Parameter | Value |
 | :--- | :--- |
-| **Version** | v1.2 |
+| **Version** | v1.3 |
 | **Access** | Free |
 | **Stage** | Active Development 🚧 |
 

@@ -46,8 +46,21 @@ const i18n = {
       resetSent: "Password reset email has been sent"
     },
 
+    monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+
+    sidebar: {
+      homeLabel: "Home",
+      plannerLabel: "Planner",
+      aiLabel: "AI",
+      teamsLabel: "Teams",
+      moreLabel: "More",
+      inviteLabel: "Invite",
+      upgradeLabel: "Upgrade",
+      dashboardLabel: "Dashboard",
+    },
+
     profile: {
-      title: "My Profile",
+      title: "Profile",
       nameLabel: "Profile Name",
       namePlaceholder: "Enter name",
       registrationDate: "Registration Date",
@@ -58,7 +71,7 @@ const i18n = {
       totalTasks: "Total Tasks",
       completed: "Completed",
       productivity: "Productivity",
-      myProfile: "My Profile",
+      myProfile: "Profile",
       ukrainian: "Ukrainian",
       english: "English",
       russian: "Русский"
@@ -74,7 +87,7 @@ const i18n = {
     },
 
     menu: {
-      myProfile: "My Profile",
+      myProfile: "Profile",
       logout: "Log Out"
     },
 
@@ -90,7 +103,8 @@ const i18n = {
       priority: "Priority",
       status: "Status",
       comments: "Comments",
-      addTask: "Add task"
+      addTask: "Add task",
+      taskNameInput: "Task Name or type '/' for commands"
     },
 
     priorities: {
@@ -114,6 +128,13 @@ const i18n = {
       taskType: "Task Type",
       save: "Save",
       cancel: "Cancel"
+    },
+
+    taskTypes: {
+      task: "Task",
+      milestone: "Milestone",
+      form: "Form Response",
+      meeting: "Meeting Note"
     },
 
     dashboard: {
@@ -304,8 +325,21 @@ const i18n = {
       resetSent: "На вашу пошту відправлено лист для скидання пароля"
     },
 
+    monthNames: ['Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень', 'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'],
+
+    sidebar: {
+      homeLabel: "Головна",
+      plannerLabel: "Планувальник",
+      aiLabel: "ШІ",
+      teamsLabel: "Команди",
+      moreLabel: "Більше",
+      inviteLabel: "Запросити",
+      upgradeLabel: "Апгрейд",
+      dashboardLabel: "Дашборд",
+    },
+
     profile: {
-      title: "Мій профіль",
+      title: "Профіль",
       nameLabel: "Ім'я профілю",
       namePlaceholder: "Введіть ім'я",
       registrationDate: "Дата реєстрації",
@@ -316,7 +350,7 @@ const i18n = {
       totalTasks: "Всього завдань",
       completed: "Виконано",
       productivity: "Продуктивність",
-      myProfile: "Мій профіль",
+      myProfile: "Профіль",
       ukrainian: "Українська",
       english: "English",
       russian: "Русский"
@@ -332,7 +366,7 @@ const i18n = {
     },
 
     menu: {
-      myProfile: "Мій профіль",
+      myProfile: "Профіль",
       logout: "Вийти"
     },
 
@@ -348,7 +382,8 @@ const i18n = {
       priority: "Пріоритет",
       status: "Статус",
       comments: "Коментарі",
-      addTask: "Додати завдання"
+      addTask: "Додати завдання",
+      taskNameInput: "Назва завдання або введіть '/' для команд"
     },
 
     priorities: {
@@ -372,6 +407,13 @@ const i18n = {
       taskType: "Тип завдання",
       save: "Зберегти",
       cancel: "Скасувати"
+    },
+
+    taskTypes: {
+      task: "Завдання",
+      milestone: "Віха",
+      form: "Форма",
+      meeting: "Примітка"
     },
 
     dashboard: {
@@ -507,8 +549,21 @@ const i18n = {
       resetSent: "Письмо для сброса пароля отправлено"
     },
 
+    monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+
+    sidebar: {
+      homeLabel: "Главная",
+      plannerLabel: "Планировщик",
+      aiLabel: "ИИ",
+      teamsLabel: "Команды",
+      moreLabel: "Больше",
+      inviteLabel: "Пригласить",
+      upgradeLabel: "Апгрейд",
+      dashboardLabel: "Дашборд",
+    },
+
     profile: {
-      title: "Мой профиль",
+      title: "Профиль",
       nameLabel: "Имя профиля",
       namePlaceholder: "Введите имя",
       registrationDate: "Дата регистрации",
@@ -519,7 +574,7 @@ const i18n = {
       totalTasks: "Всего задач",
       completed: "Завершено",
       productivity: "Продуктивность",
-      myProfile: "Мой профиль",
+      myProfile: "Профиль",
       ukrainian: "Українська",
       english: "English",
       russian: "Русский"
@@ -535,7 +590,7 @@ const i18n = {
     },
 
     menu: {
-      myProfile: "Мой профиль",
+      myProfile: "Профиль",
       logout: "Выйти"
     },
 
@@ -551,7 +606,8 @@ const i18n = {
       priority: "Приоритет",
       status: "Статус",
       comments: "Комментарии",
-      addTask: "Добавить задачу"
+      addTask: "Добавить задачу",
+      taskNameInput: "Название задачи или введите '/' для команд"
     },
 
     priorities: {
@@ -575,6 +631,13 @@ const i18n = {
       taskType: "Тип задачи",
       save: "Сохранить",
       cancel: "Отмена"
+    },
+
+    taskTypes: {
+      task: "Задание",
+      milestone: "Веха",
+      form: "Форма",
+      meeting: "Примечание"
     },
 
     dashboard: {
@@ -704,7 +767,15 @@ function applyFullLanguage(lang) {
   setTextSafe('#loginButton .txt', t.login);
   setTextSafe('#registerButton .txt', t.createAccount);
   setTextSafe('#resetPasswordButton .txt', t.resetPassword);
-
+  setTextSafe('#breadcrumbs', t.breadcrumbs);
+  setTextSafe('#homeLabel', t.sidebar.homeLabel);
+  setTextSafe('#plannerLabel', t.sidebar.plannerLabel);
+  setTextSafe('#aiLabel', t.sidebar.aiLabel);
+  setTextSafe('#teamsLabel', t.sidebar.teamsLabel);
+  setTextSafe('#moreLabel', t.sidebar.moreLabel);
+  setTextSafe('#inviteLabel', t.sidebar.inviteLabel);
+  setTextSafe('#upgradeLabel', t.sidebar.upgradeLabel);
+  setTextSafe('#dashboardLabel', t.sidebar.dashboardLabel);
 
   // ===== ABOUT PAGE =====
   setTextSafe('.about-title', t.about?.heroTitle);
@@ -884,7 +955,7 @@ function applyFullLanguage(lang) {
   setTextSafe('#selectedDateTitle', t.calendar?.selectDate || 'Select Date');
   
   const selectedDateDisplay = document.getElementById('selectedDateDisplay');
-  if (selectedDateDisplay && (selectedDateDisplay.textContent === 'Дата не вибрана' || selectedDateDisplay.textContent === 'No date selected')) {
+  if (selectedDateDisplay && selectedDateDisplay.classList.contains('is-empty')) {
     selectedDateDisplay.textContent = t.calendar?.noDateSelected || 'No date selected';
   }
   
@@ -978,12 +1049,6 @@ function applyLang(lang) {
   let selectedDate = null;
   let selectedDateForTask = null;
 
-  const monthNames = {
-    en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-    ua: ['Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень', 'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'],
-    ru: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
-  };
-
   function renderQuickCalendarContent() {
     const grid = document.getElementById('quickCalendarGrid');
     const title = document.getElementById('quickMonthTitle');
@@ -994,7 +1059,7 @@ function applyLang(lang) {
     const lang = localStorage.getItem('site_lang') || 'en';
     const t = i18n[lang];
     
-    title.textContent = `${monthNames[lang][month]} ${year}`;
+    title.textContent = `${t.monthNames[month]} ${year}`;
 
     grid.innerHTML = '';
 
@@ -1172,10 +1237,7 @@ function applyLang(lang) {
   }
 
   function saveTask(task) {
-    console.log('saveTask called', task);
-
     const user = getCurrentUser();
-    console.log('currentUser', user);
     if (!user) {
       console.error('NO USER');
       showNotification('User not logged in', 'error');
@@ -1228,7 +1290,10 @@ function applyLang(lang) {
   }
 
   function restoreAddRow(row) {
-    row.innerHTML = `<td colspan="7"><button class="add-task-btn">+ Add task</button></td>`;
+    const savedLang = localStorage.getItem('site_lang');
+    const currentLang = typeof i18n !== 'undefined' && i18n[savedLang] ? savedLang : 'en';
+    const t = typeof i18n !== 'undefined' ? i18n[currentLang] : {};
+    row.innerHTML = `<td colspan="7"><button class="add-task-btn">+ ${t.table.addTask}</button></td>`;
     row.classList.remove('active');
     const input = row.querySelector('.task-name-input');
     if (input) input.value = '';
@@ -1275,10 +1340,11 @@ function applyLang(lang) {
     if (!calendarGrid || !calendarTitle) return;
 
     const lang = localStorage.getItem('site_lang') || 'en';
+    const t = i18n[lang];
     const year = currentCalendarDate.getFullYear();
     const month = currentCalendarDate.getMonth();
 
-    calendarTitle.textContent = `${monthNames[lang][month]} ${year}`;
+    calendarTitle.textContent = `${t.monthNames[month]} ${year}`;
 
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
@@ -1401,7 +1467,7 @@ function applyLang(lang) {
       
     selectedDateTitle.textContent = date.toLocaleDateString(locale, options);
     addTaskForDateBtn.style.display = 'flex';
-    addTaskForDateBtn.innerHTML = `<span style="font-size: 20px; margin-right: 4px;">+</span> ${t.calendar?.addTaskBtn || '+ Add task'}`;
+    addTaskForDateBtn.innerHTML = `<span style="font-size: 20px; margin-right: 4px;"></span> ${t.calendar?.addTaskBtn || '+ Add task'}`;
 
     const tasks = getTasksForDate(dateStr);
       
@@ -1442,12 +1508,15 @@ function applyLang(lang) {
       e.stopPropagation();
       removeMenus();
 
+      const savedLang = localStorage.getItem('site_lang');
+      const currentLang = typeof i18n !== 'undefined' && i18n[savedLang] ? savedLang : 'en';
+      const t = typeof i18n !== 'undefined' ? i18n[currentLang] : {};
       const menu = document.createElement('div');
       menu.className = 'status-menu';
       menu.innerHTML = `
-        <div class="status-item" data-status="TO DO"><span class="task-status-dot dot-todo type-task"></span> TO DO</div>
-        <div class="status-item" data-status="IN PROGRESS"><span class="task-status-dot dot-progress type-task"></span> IN PROGRESS</div>
-        <div class="status-item" data-status="DONE"><span class="task-status-dot dot-done type-task"></span> DONE</div>
+        <div class="status-item" data-status="TO DO"><span class="task-status-dot dot-todo type-task"></span> ${t.statuses.todo}</div>
+        <div class="status-item" data-status="IN PROGRESS"><span class="task-status-dot dot-progress type-task"></span> ${t.statuses.inProgress}</div>
+        <div class="status-item" data-status="DONE"><span class="task-status-dot dot-done type-task"></span> ${t.statuses.done}</div>
       `;
 
       document.body.appendChild(menu);
@@ -1468,7 +1537,19 @@ function applyLang(lang) {
     const badge = row.querySelector('.status');
     const dot = row.querySelector('.task-status-dot');
 
-    badge.textContent = status;
+    const savedLang = localStorage.getItem('site_lang');
+    const currentLang = typeof i18n !== 'undefined' && i18n[savedLang] ? savedLang : 'en';
+    const t = typeof i18n !== 'undefined' ? i18n[currentLang] : {};
+
+    const statusKeys = {
+      'TO DO': 'todo',
+      'IN PROGRESS': 'inProgress',
+      'DONE': 'done'
+    };
+
+    const translationKey = statusKeys[status];
+    badge.textContent = (t.statuses && t.statuses[translationKey]) ? t.statuses[translationKey] : status;
+
     badge.className = 'status ' + statusClass(status);
 
     dot.classList.remove('dot-todo', 'dot-progress', 'dot-done');
@@ -1496,21 +1577,23 @@ function applyLang(lang) {
     const img = cell.querySelector('img');
     const label = cell.querySelector('.priority-label');
     const row = cell.closest('tr');
-
+    
     cell.dataset.priority = priority;
 
+    const savedLang = localStorage.getItem('site_lang');
+    const currentLang = typeof i18n !== 'undefined' && i18n[savedLang] ? savedLang : 'en';
+    const t = typeof i18n !== 'undefined' ? i18n[currentLang] : {};
+    
     const map = {
-      urgent: { icon: '../../assets/images/urgent_icon.png', text: 'Urgent' },
-      high:   { icon: '../../assets/images/high_icon.png',   text: 'High' },
-      normal: { icon: '../../assets/images/normal_icon.png', text: 'Normal' },
-      low:    { icon: '../../assets/images/low_icon.png',    text: 'Low' },
-      none:   { icon: '../../assets/images/priority_icon.png', text: '' }
+      urgent: { icon: '../../assets/images/urgent_icon.png', text: t.priorities?.urgent || 'Urgent' },
+      high:   { icon: '../../assets/images/high_icon.png',   text: t.priorities?.high || 'High' },
+      normal: { icon: '../../assets/images/normal_icon.png', text: t.priorities?.normal || 'Normal' },
+      low:    { icon: '../../assets/images/low_icon.png',    text: t.priorities?.low || 'Low' },
+      none:   { icon: '../../assets/images/priority_icon.png', text: t.priorities?.none || '' }
     };
 
     if (img) img.src = map[priority].icon;
     if (label) label.textContent = map[priority].text;
-
-    updateTask(row.dataset.id, { priority });
 
     if (row && row.dataset.id) {
       updateTask(row.dataset.id, { priority });
@@ -1521,7 +1604,18 @@ function applyLang(lang) {
     if (!dateStr) return '';
     const d = new Date(dateStr);
     if (isNaN(d.getTime())) return '';
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+    const savedLang = localStorage.getItem('site_lang');
+    const currentLang = typeof i18n !== 'undefined' && i18n[savedLang] ? savedLang : 'en';
+    const t = typeof i18n !== 'undefined' ? i18n[currentLang] : {};
+
+    const locales = {
+      ua: 'uk-UA',
+      ru: 'ru-RU',
+      en: 'en-US'
+    };
+
+    return d.toLocaleDateString(locales[currentLang] || 'en-US', { month: 'short', day: 'numeric' });
   }
 
   function openCalendarForTask(taskId, targetElement) {
@@ -1592,9 +1686,22 @@ function applyLang(lang) {
     row.dataset.id = task.id;
     row.dataset.status = task.status;
 
+    const savedLang = localStorage.getItem('site_lang');
+    const currentLang = typeof i18n !== 'undefined' && i18n[savedLang] ? savedLang : 'en';
+    const t = typeof i18n !== 'undefined' ? i18n[currentLang] : {};
+
     const dateHtml = task.date 
         ? `<span class="date-text">${formatShortDate(task.date)}</span>` 
         : `<img src="../../assets/images/date_icon.png">`;
+
+    const statusKeys = {
+      'TO DO': 'todo',
+      'IN PROGRESS': 'inProgress',
+      'DONE': 'done'
+    };
+
+    const translationKey = statusKeys[task.status];
+    const translatedStatus = (t.statuses && t.statuses[translationKey]) ? t.statuses[translationKey] : task.status;
 
     row.innerHTML = `
       <td>
@@ -1609,7 +1716,7 @@ function applyLang(lang) {
         <img src="../../assets/images/priority_icon.png">
         <span class="priority-label"></span>
       </td>
-      <td><span class="status ${statusClass(task.status)}">${task.status}</span></td>
+      <td><span class="status ${statusClass(task.status)}">${translatedStatus}</span></td>
       <td class="icon-cell"><img src="../../assets/images/comment_icon.png"></td>
       <td class="icon-cell">
         <button class="task-menu-btn" style="color: #666; background: none; border: none;">···</button>
@@ -1698,7 +1805,7 @@ function applyLang(lang) {
           dashboard.style.display = 'flex';
         }
         if (location.pathname.includes('about')) {
-          window.location.href = '/index.html';
+          window.location.href = '../index.html';
         }
         if (userInfo) {
           userInfo.style.display = 'flex';
@@ -2288,25 +2395,24 @@ function applyLang(lang) {
 
 
 
-
-
-
+    const currentLang = typeof i18n !== 'undefined' && i18n[savedLang] ? savedLang : 'en';
+    const t = typeof i18n !== 'undefined' ? i18n[currentLang] : {};
 
     const TASK_TYPES = {
       task: {
-        label: 'Task',
+        label: `${t.taskTypes.task}`,
         class: 'type-task'
       },
       milestone: {
-        label: 'Milestone',
+        label: `${t.taskTypes.milestone}`,
         class: 'type-milestone'
       },
       form: {
-        label: 'Form Response',
+        label: `${t.taskTypes.form}`,
         class: 'type-form'
       },
       meeting: {
-        label: 'Meeting Note',
+        label: `${t.taskTypes.meeting}`,
         class: 'type-meeting'
       }
     };
@@ -2328,6 +2434,10 @@ function applyLang(lang) {
       const btn = e.target.closest('.add-task-btn');
       if (!btn) return;
 
+      const savedLang = localStorage.getItem('site_lang');
+      const currentLang = typeof i18n !== 'undefined' && i18n[savedLang] ? savedLang : 'en';
+      const t = typeof i18n !== 'undefined' ? i18n[currentLang] : {};
+
       const row = btn.closest('.add-task-row');
       const status = row.dataset.status;
 
@@ -2338,17 +2448,17 @@ function applyLang(lang) {
 
             <input
               class="task-name-input"
-              placeholder="Task Name or type '/' for commands"
+              placeholder="${t.table.taskNameInput}"
             >
 
             <div class="add-task-actions">
               <div class="task-type-btn" data-type="task">
                 <span class="task-status-dot type-task"></span>
-                <span class="task-type-label">Task</span>
+                <span class="task-type-label">${t.taskTypes.task}</span>
               </div>
 
               <button class="add-task-icon" title="Due date">
-                  <img src="../../assets/images/date_icon.png">
+                <img src="../../assets/images/date_icon.png">
               </button>
 
               <div class="priority-btn" data-priority="none">
@@ -2356,8 +2466,8 @@ function applyLang(lang) {
                 <span class="priority-label"></span>
               </div>
 
-              <span class="task-cancel">Cancel</span>
-              <button type="button" class="task-save">Save ↵</button>
+              <span class="task-cancel">${t.taskActions.cancel}</span>
+              <button type="button" class="task-save">${t.taskActions.save} ↵</button>
             </div>
           </div>
         </td>
@@ -2375,8 +2485,6 @@ function applyLang(lang) {
     document.addEventListener('click', e => {
       const saveBtn = e.target.closest('.task-save');
       if (!saveBtn) return;
-      
-      console.log('SAVE BUTTON CLICKED', saveBtn);
 
       const row = saveBtn.closest('.add-task-row');
       const input = row.querySelector('.task-name-input');
@@ -2399,9 +2507,6 @@ function applyLang(lang) {
         priority: currentPriority
       };
       const taskRow = createTaskRow(task);
-
-      console.log('TASK TO SAVE', task);
-
       saveTask(task);
 
       renderTask(task, row); 
@@ -2482,6 +2587,10 @@ function applyLang(lang) {
       const btn = e.target.closest('.priority-btn');
       if (!btn) return;
 
+      const savedLang = localStorage.getItem('site_lang');
+      const currentLang = typeof i18n !== 'undefined' && i18n[savedLang] ? savedLang : 'en';
+      const t = typeof i18n !== 'undefined' ? i18n[currentLang] : {};
+
       e.stopPropagation();
       removePriorityMenu();
 
@@ -2489,11 +2598,11 @@ function applyLang(lang) {
       menu.className = 'priority-menu';
 
       menu.innerHTML = `
-        <button data-p="urgent"><img src="../../assets/images/urgent_icon.png"> Urgent</button>
-        <button data-p="high"><img src="../../assets/images/high_icon.png"> High</button>
-        <button data-p="normal"><img src="../../assets/images/normal_icon.png"> Normal</button>
-        <button data-p="low"><img src="../../assets/images/low_icon.png"> Low</button>
-        <button data-p="none"><img src="../../assets/images/clear_icon.png"> Clear</button>
+        <button data-p="urgent" id="urgent-btn"><img src="../../assets/images/urgent_icon.png"> ${t.priorities.urgent}</button>
+        <button data-p="high" id="high-btn"><img src="../../assets/images/high_icon.png"> ${t.priorities.high}</button>
+        <button data-p="normal" id="normal-btn"><img src="../../assets/images/normal_icon.png"> ${t.priorities.normal}</button>
+        <button data-p="low" id="low-btn"><img src="../../assets/images/low_icon.png"> ${t.priorities.low}</button>
+        <button data-p="none" id="none-btn"><img src="../../assets/images/clear_icon.png"> ${t.priorities.clear}</button>
       `;
 
       document.body.appendChild(menu);

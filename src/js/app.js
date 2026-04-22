@@ -2911,22 +2911,97 @@ function applyLang(lang) {
     }
 
     function updateDashboardStats() {
+      const normalizeStatus = (statusText = '') => {
+        const normalized = statusText.toString().trim().toUpperCase();
+
+        if (
+          normalized === 'TO DO' ||
+          normalized === 'TODO' ||
+          normalized === 'ЗРОБИТИ' ||
+          normalized === 'СДЕЛАТЬ'
+        ) {
+          return 'TO DO';
+        }
+
+        if (
+          normalized === 'IN PROGRESS' ||
+          normalized === 'IN-PROGRESS' ||
+          normalized === 'В ПРОЦЕСІ' ||
+          normalized === 'В ПРОЦЕССЕ'
+        ) {
+          return 'IN PROGRESS';
+        }
+
+        if (
+          normalized === 'DONE' ||
+          normalized === 'COMPLETED' ||
+          normalized === 'ГОТОВО' ||
+          normalized === 'ЗАВЕРШЕНО' ||
+          normalized === 'ВЫПОЛНЕНО' ||
+          normalized === 'ВИКОНАНО' ||
+          normalized === 'СДЕЛАНО'
+        ) {
+          return 'DONE';
+        }
+
+        return normalized;
+      };
+
+      const normalizePriority = (priorityText = '') => {
+        const normalized = priorityText.toString().trim().toLowerCase();
+
+        if (
+          !normalized ||
+          normalized === 'none' ||
+          normalized === 'без пріоритету' ||
+          normalized === 'без приоритета' ||
+          normalized === 'no priority'
+        ) {
+          return 'none';
+        }
+
+        if (normalized === 'urgent' || normalized === 'терміново' || normalized === 'срочно') return 'urgent';
+        if (normalized === 'high' || normalized === 'високий' || normalized === 'высокий') return 'high';
+        if (normalized === 'normal' || normalized === 'звичайний' || normalized === 'обычный') return 'normal';
+        if (normalized === 'low' || normalized === 'низький' || normalized === 'низкий') return 'low';
+
+        return normalized;
+      };
+
       const tasks = [];
-      const rows = document.querySelectorAll('.table tbody tr:not(.group-row):not([class*="add-task"])');
-      
-      rows.forEach(row => {
-        const nameCell = row.querySelector('.name-cell');
-        const statusCell = row.querySelector('.status');
-        const priorityBtn = row.querySelector('.priority-btn');
+      const user = typeof getCurrentUserData === 'function' ? getCurrentUserData() : null;
+      const userTasks = Array.isArray(user?.tasks) ? user.tasks : [];
 
-        if (!nameCell || !statusCell) return;
+      if (userTasks.length > 0) {
+        userTasks.forEach(task => {
+          const rawName = task?.name || task?.text || '';
+          const rawStatus = task?.status || '';
+          const rawPriority = task?.priority || '';
 
-        tasks.push({
-          name: nameCell.textContent.trim(),
-          status: statusCell.textContent.trim(),
-          priority: priorityBtn?.dataset.priority || ''
+          if (!rawName || !rawStatus) return;
+
+          tasks.push({
+            name: String(rawName).trim(),
+            status: normalizeStatus(rawStatus),
+            priority: normalizePriority(rawPriority)
+          });
         });
-      });
+      } else {
+        const rows = document.querySelectorAll('.table tbody tr:not(.group-row):not([class*="add-task"])');
+        rows.forEach(row => {
+          const nameCell = row.querySelector('.name-cell');
+          const statusCell = row.querySelector('.status');
+          const priorityBtn = row.querySelector('.priority-btn');
+
+          if (!nameCell || !statusCell) return;
+
+          tasks.push({
+            name: nameCell.textContent.trim(),
+            status: normalizeStatus(statusCell.textContent),
+            priority: normalizePriority(priorityBtn?.dataset.priority || priorityBtn?.textContent || '')
+          });
+        });
+      }
 
       const totalTasks = tasks.length;
       const inProgress = tasks.filter(t => t.status === 'IN PROGRESS').length;
@@ -2934,10 +3009,10 @@ function applyLang(lang) {
       const todo = tasks.filter(t => t.status === 'TO DO').length;
       const productivity = totalTasks > 0 ? Math.round((completed / totalTasks) * 100) : 0;
 
-      const urgent = tasks.filter(t => t.priority.toLowerCase().includes('urgent')).length;
-      const high = tasks.filter(t => t.priority.toLowerCase().includes('high')).length;
-      const normal = tasks.filter(t => t.priority.toLowerCase().includes('normal')).length;
-      const low = tasks.filter(t => t.priority.toLowerCase().includes('low')).length;
+      const urgent = tasks.filter(t => t.priority === 'urgent').length;
+      const high = tasks.filter(t => t.priority === 'high').length;
+      const normal = tasks.filter(t => t.priority === 'normal').length;
+      const low = tasks.filter(t => t.priority === 'low').length;
 
       const setTextSafe = (id, text) => {
         const el = document.getElementById(id);
@@ -2967,14 +3042,30 @@ function applyLang(lang) {
         setBarWidth('todoBar', (todo / totalTasks) * 100);
         setBarWidth('progressBar', (inProgress / totalTasks) * 100);
         setBarWidth('doneBar', (completed / totalTasks) * 100);
+      } else {
+        setBarWidth('todoBar', 0);
+        setBarWidth('progressBar', 0);
+        setBarWidth('doneBar', 0);
       }
 
       const recentTasksContainer = document.getElementById('recentTasks');
-      if (recentTasksContainer && tasks.length > 0) {
+      if (recentTasksContainer) {
         recentTasksContainer.innerHTML = '';
-        
         const recentTasks = tasks.slice(-5).reverse();
-        
+
+        if (!recentTasks.length) {
+          recentTasksContainer.innerHTML = `
+            <div class="activity-item">
+              <div class="activity-icon" style="background: #3b82f6;">📝</div>
+              <div class="activity-content">
+                <p class="activity-text">Поки немає завдань. Створіть своє перше завдання!</p>
+                <span class="activity-time">Зараз</span>
+              </div>
+            </div>
+          `;
+          return;
+        }
+
         recentTasks.forEach(task => {
           const activityItem = document.createElement('div');
           activityItem.className = 'activity-item';
@@ -2993,11 +3084,15 @@ function applyLang(lang) {
             bgColor = '#ef4444';
           }
           
+          const details = task.priority && task.priority !== 'none'
+            ? `${task.status} • ${task.priority}`
+            : task.status;
+
           activityItem.innerHTML = `
             <div class="activity-icon" style="background: ${bgColor};">${icon}</div>
             <div class="activity-content">
               <p class="activity-text">${task.name}</p>
-              <span class="activity-time">${task.status}${task.priority ? ' • ' + task.priority : ''}</span>
+              <span class="activity-time">${details}</span>
             </div>
           `;
           
@@ -3225,6 +3320,16 @@ function applyLang(lang) {
         };
         
         saveTask(task);
+
+        const addRow = document.querySelector(`.add-task-row[data-status="${task.status}"]`);
+        const existingRow = document.querySelector(`tr[data-id="${task.id}"]`);
+        if (addRow && !existingRow) {
+          renderTask(task, addRow);
+        }
+
+        if (typeof updateDashboardStats === 'function') {
+          updateDashboardStats();
+        }
         
         closeOverlay(modalDateTask);
         displayTasksForDate(selectedDateForTask);

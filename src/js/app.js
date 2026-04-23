@@ -1119,32 +1119,40 @@ function applyLang(lang) {
     return s === 'DONE' ? 'dot-done' : s === 'IN PROGRESS' ? 'dot-progress' : 'dot-todo';
   }
 
-  function getUsers() {
-    return JSON.parse(localStorage.getItem('users') || '[]');
-  }
-
-  function saveUsers(users) {
-    localStorage.setItem('users', JSON.stringify(users));
-  }
-
   function getCurrentUser() {
     return localStorage.getItem('currentUser');
   }
 
-  function getCurrentUserData() {
+  async function getCurrentUserData() {
     const email = getCurrentUser();
-    const users = getUsers();
-    return users.find(u => u.email === email);
+    if (!email) return null;
+
+    try {
+      const response = await fetch(`/api/users?email=${encodeURIComponent(email)}`);
+      if (!response.ok) throw new Error('User not found');
+      
+      return await response.json(); 
+    } catch (error) {
+      console.error('Data retrieval error:', error);
+      return null;
+    }
   }
 
-  function updateCurrentUserData(updateFn) {
-    const users = getUsers();
+  async function updateCurrentUserData(updateFn) {
     const email = getCurrentUser();
-    const index = users.findIndex(u => u.email === email);
-    if (index === -1) return;
+    if (!email) return;
 
-    updateFn(users[index]);
-    saveUsers(users);
+    try {
+      const response = await fetch(`/api/users?email=${encodeURIComponent(email)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updateData)
+      });
+
+      if (!response.ok) throw new Error('Update error');
+    } catch (error) {
+      console.error('User data update error:', error);
+    }
   }
 
   function removeAllMenus() {
@@ -1257,24 +1265,41 @@ function applyLang(lang) {
     });
   }
 
-  function saveUser(email, password) {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    users.push({
+  async function saveUser(email, password) {
+    const newUser = {
       email,
       password,
-      registeredAt: new Date().toISOString(),
-      tasks: [],
-      profile: {
-        name: email.split('@')[0],
-        avatarColor: null
-      }
-    });
-    localStorage.setItem('users', JSON.stringify(users));
+      name: getEmailName(email)
+    };
+
+    try {
+      const response = await fetch('/api/users/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newUser)
+      });
+
+      if (!response.ok) throw new Error('Registration error');
+      return await response.json();
+    } catch (error) {
+      console.error('User save error:', error);
+    }
   }
 
-  function findUser(email, password) {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    return users.find(u => u.email === email && u.password === password);
+  async function findUser(email, password) {
+    try {
+      const response = await fetch('/api/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      if (!response.ok) return null;
+      return await response.json();
+    } catch (error) {
+      console.error('User login error:', error);
+      return null;
+    }
   }
 
   function setCurrentUser(email) {
@@ -1794,7 +1819,7 @@ function applyLang(lang) {
     const avatarLetter = document.getElementById('avatarLetter');
     const userAvatar = document.getElementById('userAvatar');
 
-    function updateUIForUser() {
+    async function updateUIForUser() {
       const currentUser = getCurrentUser();
       const landing = document.getElementById('landingPage');
       const dashboard = document.getElementById('dashboardPage');
@@ -1809,7 +1834,7 @@ function applyLang(lang) {
         }
         if (userInfo) {
           userInfo.style.display = 'flex';
-          const userData = getCurrentUserData();
+          const userData = await getCurrentUserData();
           const displayName = userData?.profile?.name || getEmailName(currentUser);
           
           if (userName) userName.textContent = displayName;
@@ -1841,8 +1866,8 @@ function applyLang(lang) {
     const openProfileBtn = document.getElementById('openProfileBtn');
     const saveProfileBtn = document.getElementById('saveProfileBtn');
 
-    function openProfileModal() {
-      const user = getCurrentUserData();
+    async function openProfileModal() {
+      const user = await getCurrentUserData();
       if (!user) return;
 
       const profileName = document.getElementById('profileName');
@@ -1924,7 +1949,7 @@ function applyLang(lang) {
           user.profile.avatarColor = generateColor(newName);
         });
 
-        const user = getCurrentUserData();
+        const user = await getCurrentUserData();
         const userName = document.getElementById('userName');
         const avatarLetter = document.getElementById('avatarLetter');
         const userAvatar = document.getElementById('userAvatar');
@@ -1996,9 +2021,8 @@ function applyLang(lang) {
         localStorage.getItem('site_lang') || 'en';
 
       const t = i18n[currentLang];
-
       const langData = {
-        uk: { flag: '🇺🇦', name: t.profile?.ukrainian || 'Українська' },
+        ua: { flag: '🇺🇦', name: t.profile?.ukrainian || 'Українська' },
         en: { flag: '🇬🇧', name: t.profile?.english || 'English' },
         ru: { flag: '🇷🇺', name: t.profile?.russian || 'Русский' }
       };
@@ -2911,97 +2935,22 @@ function applyLang(lang) {
     }
 
     function updateDashboardStats() {
-      const normalizeStatus = (statusText = '') => {
-        const normalized = statusText.toString().trim().toUpperCase();
-
-        if (
-          normalized === 'TO DO' ||
-          normalized === 'TODO' ||
-          normalized === 'ЗРОБИТИ' ||
-          normalized === 'СДЕЛАТЬ'
-        ) {
-          return 'TO DO';
-        }
-
-        if (
-          normalized === 'IN PROGRESS' ||
-          normalized === 'IN-PROGRESS' ||
-          normalized === 'В ПРОЦЕСІ' ||
-          normalized === 'В ПРОЦЕССЕ'
-        ) {
-          return 'IN PROGRESS';
-        }
-
-        if (
-          normalized === 'DONE' ||
-          normalized === 'COMPLETED' ||
-          normalized === 'ГОТОВО' ||
-          normalized === 'ЗАВЕРШЕНО' ||
-          normalized === 'ВЫПОЛНЕНО' ||
-          normalized === 'ВИКОНАНО' ||
-          normalized === 'СДЕЛАНО'
-        ) {
-          return 'DONE';
-        }
-
-        return normalized;
-      };
-
-      const normalizePriority = (priorityText = '') => {
-        const normalized = priorityText.toString().trim().toLowerCase();
-
-        if (
-          !normalized ||
-          normalized === 'none' ||
-          normalized === 'без пріоритету' ||
-          normalized === 'без приоритета' ||
-          normalized === 'no priority'
-        ) {
-          return 'none';
-        }
-
-        if (normalized === 'urgent' || normalized === 'терміново' || normalized === 'срочно') return 'urgent';
-        if (normalized === 'high' || normalized === 'високий' || normalized === 'высокий') return 'high';
-        if (normalized === 'normal' || normalized === 'звичайний' || normalized === 'обычный') return 'normal';
-        if (normalized === 'low' || normalized === 'низький' || normalized === 'низкий') return 'low';
-
-        return normalized;
-      };
-
       const tasks = [];
-      const user = typeof getCurrentUserData === 'function' ? getCurrentUserData() : null;
-      const userTasks = Array.isArray(user?.tasks) ? user.tasks : [];
+      const rows = document.querySelectorAll('.table tbody tr:not(.group-row):not([class*="add-task"])');
+      
+      rows.forEach(row => {
+        const nameCell = row.querySelector('.name-cell');
+        const statusCell = row.querySelector('.status');
+        const priorityBtn = row.querySelector('.priority-btn');
 
-      if (userTasks.length > 0) {
-        userTasks.forEach(task => {
-          const rawName = task?.name || task?.text || '';
-          const rawStatus = task?.status || '';
-          const rawPriority = task?.priority || '';
+        if (!nameCell || !statusCell) return;
 
-          if (!rawName || !rawStatus) return;
-
-          tasks.push({
-            name: String(rawName).trim(),
-            status: normalizeStatus(rawStatus),
-            priority: normalizePriority(rawPriority)
-          });
+        tasks.push({
+          name: nameCell.textContent.trim(),
+          status: statusCell.textContent.trim(),
+          priority: priorityBtn?.dataset.priority || ''
         });
-      } else {
-        const rows = document.querySelectorAll('.table tbody tr:not(.group-row):not([class*="add-task"])');
-        rows.forEach(row => {
-          const nameCell = row.querySelector('.name-cell');
-          const statusCell = row.querySelector('.status');
-          const priorityBtn = row.querySelector('.priority-btn');
-
-          if (!nameCell || !statusCell) return;
-
-          tasks.push({
-            name: nameCell.textContent.trim(),
-            status: normalizeStatus(statusCell.textContent),
-            priority: normalizePriority(priorityBtn?.dataset.priority || priorityBtn?.textContent || '')
-          });
-        });
-      }
+      });
 
       const totalTasks = tasks.length;
       const inProgress = tasks.filter(t => t.status === 'IN PROGRESS').length;
@@ -3009,10 +2958,10 @@ function applyLang(lang) {
       const todo = tasks.filter(t => t.status === 'TO DO').length;
       const productivity = totalTasks > 0 ? Math.round((completed / totalTasks) * 100) : 0;
 
-      const urgent = tasks.filter(t => t.priority === 'urgent').length;
-      const high = tasks.filter(t => t.priority === 'high').length;
-      const normal = tasks.filter(t => t.priority === 'normal').length;
-      const low = tasks.filter(t => t.priority === 'low').length;
+      const urgent = tasks.filter(t => t.priority.toLowerCase().includes('urgent')).length;
+      const high = tasks.filter(t => t.priority.toLowerCase().includes('high')).length;
+      const normal = tasks.filter(t => t.priority.toLowerCase().includes('normal')).length;
+      const low = tasks.filter(t => t.priority.toLowerCase().includes('low')).length;
 
       const setTextSafe = (id, text) => {
         const el = document.getElementById(id);
@@ -3042,30 +2991,14 @@ function applyLang(lang) {
         setBarWidth('todoBar', (todo / totalTasks) * 100);
         setBarWidth('progressBar', (inProgress / totalTasks) * 100);
         setBarWidth('doneBar', (completed / totalTasks) * 100);
-      } else {
-        setBarWidth('todoBar', 0);
-        setBarWidth('progressBar', 0);
-        setBarWidth('doneBar', 0);
       }
 
       const recentTasksContainer = document.getElementById('recentTasks');
-      if (recentTasksContainer) {
+      if (recentTasksContainer && tasks.length > 0) {
         recentTasksContainer.innerHTML = '';
+        
         const recentTasks = tasks.slice(-5).reverse();
-
-        if (!recentTasks.length) {
-          recentTasksContainer.innerHTML = `
-            <div class="activity-item">
-              <div class="activity-icon" style="background: #3b82f6;">📝</div>
-              <div class="activity-content">
-                <p class="activity-text">Поки немає завдань. Створіть своє перше завдання!</p>
-                <span class="activity-time">Зараз</span>
-              </div>
-            </div>
-          `;
-          return;
-        }
-
+        
         recentTasks.forEach(task => {
           const activityItem = document.createElement('div');
           activityItem.className = 'activity-item';
@@ -3084,15 +3017,11 @@ function applyLang(lang) {
             bgColor = '#ef4444';
           }
           
-          const details = task.priority && task.priority !== 'none'
-            ? `${task.status} • ${task.priority}`
-            : task.status;
-
           activityItem.innerHTML = `
             <div class="activity-icon" style="background: ${bgColor};">${icon}</div>
             <div class="activity-content">
               <p class="activity-text">${task.name}</p>
-              <span class="activity-time">${details}</span>
+              <span class="activity-time">${task.status}${task.priority ? ' • ' + task.priority : ''}</span>
             </div>
           `;
           
@@ -3320,16 +3249,6 @@ function applyLang(lang) {
         };
         
         saveTask(task);
-
-        const addRow = document.querySelector(`.add-task-row[data-status="${task.status}"]`);
-        const existingRow = document.querySelector(`tr[data-id="${task.id}"]`);
-        if (addRow && !existingRow) {
-          renderTask(task, addRow);
-        }
-
-        if (typeof updateDashboardStats === 'function') {
-          updateDashboardStats();
-        }
         
         closeOverlay(modalDateTask);
         displayTasksForDate(selectedDateForTask);

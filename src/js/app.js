@@ -729,7 +729,7 @@ const i18n = {
 
 const supabaseUrl = 'https://upchtijmzobyirjqidts.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwY2h0aWptem9ieWlyanFpZHRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwMTgzODUsImV4cCI6MjA5MjU5NDM4NX0.p65ieyqaG8FLXlfYHbRw3rtO_Dw6o-_JmRrO2trR-Rg';
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 function applyFullLanguage(lang) {
   const t = i18n[lang] || i18n['en'];
@@ -1130,7 +1130,7 @@ function applyLang(lang) {
     const email = getCurrentUser();
     if (!email) return null;
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('users')
       .select('*')
       .eq('email', email)
@@ -1147,7 +1147,7 @@ function applyLang(lang) {
     const email = getCurrentUser();
     if (!email) return;
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('users')
       .update(updateData) // например: { name: 'Новое Имя' }
       .eq('email', email);
@@ -1268,7 +1268,7 @@ function applyLang(lang) {
   }
 
   async function saveUser(email, password) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('users')
       .insert([
         { 
@@ -1287,7 +1287,7 @@ function applyLang(lang) {
   }
 
   async function findUser(email, password) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('users')
       .select('*')
       .eq('email', email)

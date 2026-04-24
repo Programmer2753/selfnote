@@ -727,6 +727,9 @@ const i18n = {
   }
 };
 
+const supabaseUrl = 'https://upchtijmzobyirjqidts.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwY2h0aWptem9ieWlyanFpZHRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwMTgzODUsImV4cCI6MjA5MjU5NDM4NX0.p65ieyqaG8FLXlfYHbRw3rtO_Dw6o-_JmRrO2trR-Rg';
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 function applyFullLanguage(lang) {
   const t = i18n[lang] || i18n['en'];
@@ -1127,31 +1130,30 @@ function applyLang(lang) {
     const email = getCurrentUser();
     if (!email) return null;
 
-    try {
-      const response = await fetch(`/api/users?email=${encodeURIComponent(email)}`);
-      if (!response.ok) throw new Error('User not found');
-      
-      return await response.json(); 
-    } catch (error) {
-      console.error('Data retrieval error:', error);
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single(); // Ожидаем только одну запись
+
+    if (error) {
+      console.error('Ошибка получения данных:', error.message);
       return null;
     }
+    return data;
   }
 
-  async function updateCurrentUserData(updateFn) {
+  async function updateCurrentUserData(updateData) {
     const email = getCurrentUser();
     if (!email) return;
 
-    try {
-      const response = await fetch(`/api/users?email=${encodeURIComponent(email)}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updateData)
-      });
+    const { data, error } = await supabase
+      .from('users')
+      .update(updateData) // например: { name: 'Новое Имя' }
+      .eq('email', email);
 
-      if (!response.ok) throw new Error('Update error');
-    } catch (error) {
-      console.error('User data update error:', error);
+    if (error) {
+      console.error('Ошибка обновления:', error.message);
     }
   }
 
@@ -1266,40 +1268,36 @@ function applyLang(lang) {
   }
 
   async function saveUser(email, password) {
-    const newUser = {
-      email,
-      password,
-      name: getEmailName(email)
-    };
+    const { data, error } = await supabase
+      .from('users')
+      .insert([
+        { 
+          email: email, 
+          password: password, // Важно: в реальных проектах пароли хэшируют! 
+          name: getEmailName(email) 
+        }
+      ])
+      .select(); // Просим вернуть созданную запись
 
-    try {
-      const response = await fetch('/api/users/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newUser)
-      });
-
-      if (!response.ok) throw new Error('Registration error');
-      return await response.json();
-    } catch (error) {
-      console.error('User save error:', error);
+    if (error) {
+      console.error('Ошибка при регистрации:', error.message);
+      return null;
     }
+    return data[0];
   }
 
   async function findUser(email, password) {
-    try {
-      const response = await fetch('/api/users/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .eq('password', password);
 
-      if (!response.ok) return null;
-      return await response.json();
-    } catch (error) {
-      console.error('User login error:', error);
+    if (error || data.length === 0) {
+      console.error('Неверный логин или пароль');
       return null;
     }
+    return data[0]; // Возвращаем найденного пользователя
   }
 
   function setCurrentUser(email) {
@@ -1963,6 +1961,7 @@ function applyLang(lang) {
       });
     }
 
+    
     const languageDropdownBtn = document.getElementById('languageDropdownBtn');
     const languageDropdownMenu = document.getElementById('languageDropdownMenu');
     const selectedLangFlag = document.getElementById('selectedLangFlag');

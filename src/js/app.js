@@ -1930,7 +1930,7 @@ function applyLang(lang) {
     }
 
     if (saveProfileBtn) {
-      saveProfileBtn.addEventListener('click', () => {
+      saveProfileBtn.addEventListener('click', async () => {
         const profileNameInput = document.getElementById('profileNameInput');
         const newName = profileNameInput?.value.trim();
         const currentLang = localStorage.getItem('site_lang') || 'en';
@@ -1941,10 +1941,10 @@ function applyLang(lang) {
           return;
         }
 
-        updateCurrentUserData(user => {
-          if (!user.profile) user.profile = {};
-          user.profile.name = newName;
-          user.profile.avatarColor = generateColor(newName);
+        const newColor = generateColor(newName);
+        await updateCurrentUserData({ 
+          name: newName, 
+          avatarColor: newColor 
         });
 
         const user = await getCurrentUserData();

@@ -1128,38 +1128,30 @@ function applyLang(lang) {
   }
 
   async function getCurrentUserData() {
-    const email = getCurrentUser();
-    if (!email) return null;
+    const user = await getCurrentUser();
+    if (!user) return null;
 
     const { data, error } = await supabaseClient
       .from('users')
       .select('*')
-      .eq('email', email)
+      .eq('id', user.id)
       .maybeSingle();
     
-    if (!data) {
-      logout(); 
-      return null;
-    }
-
-    if (error) {
-      console.error('Ошибка получения данных:', error.message);
-      return null;
-    }
+    if (!data) return null;
     return data;
   }
 
   async function updateCurrentUserData(updateData) {
-    const email = getCurrentUser();
-    if (!email) return;
+    const user = await getCurrentUser();
+    if (!user) return;
 
-    const { data, error } = await supabaseClient
+    const { error } = await supabaseClient
       .from('users')
-      .update(updateData) // например: { name: 'Новое Имя' }
-      .eq('email', email);
+      .update(updateData)
+      .eq('id', user.id);
 
     if (error) {
-      console.error('Ошибка обновления:', error.message);
+      console.error('Update error:', error.message);
     }
   }
 
@@ -1468,6 +1460,7 @@ function applyLang(lang) {
 
   async function getTasksForDate(dateStr) {
     const user = await getCurrentUser();
+    if (!user) return [];
     const { data, error } = await supabaseClient
       .from('tasks')
       .select('*')
@@ -1830,7 +1823,7 @@ function applyLang(lang) {
     const userAvatar = document.getElementById('userAvatar');
 
     async function updateUIForUser() {
-      const currentUser = getCurrentUser();
+      const currentUser = await getCurrentUser();
       const landing = document.getElementById('landingPage');
       const dashboard = document.getElementById('dashboardPage');
 
@@ -1845,7 +1838,7 @@ function applyLang(lang) {
         if (userInfo) {
           userInfo.style.display = 'flex';
           const userData = await getCurrentUserData();
-          const displayName = userData?.profile?.name || getEmailName(currentUser);
+          const displayName = userData?.name || getEmailName(currentUser.email);
           
           if (userName) userName.textContent = displayName;
           if (avatarLetter && userAvatar) {
@@ -1877,8 +1870,14 @@ function applyLang(lang) {
     const saveProfileBtn = document.getElementById('saveProfileBtn');
 
     async function openProfileModal() {
-      const user = await getCurrentUserData();
-      if (!user) return;
+      const currentUser = await getCurrentUser();
+      const userData = await getCurrentUserData();
+      if (!currentUser || !userData) return;
+
+      const { data: tasks } = await supabaseClient
+        .from('tasks')
+        .select('*')
+        .eq('user_id', currentUser.id);
 
       const profileName = document.getElementById('profileName');
       const profileEmail = document.getElementById('profileEmail');
@@ -1887,24 +1886,24 @@ function applyLang(lang) {
       const profileNameInput = document.getElementById('profileNameInput');
       const profileRegistered = document.getElementById('profileRegistered');
       
-      const totalTasks = user.tasks ? user.tasks.length : 0;
-      const completedTasks = user.tasks ? user.tasks.filter(t => t.status === 'DONE').length : 0;
+      const totalTasks = tasks ? tasks.length : 0;
+      const completedTasks = tasks ? tasks.filter(t => t.status === 'DONE').length : 0;
       const productivity = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-      const displayName = user.profile?.name || user.email.split('@')[0];
+      const displayName = userData.name || currentUser.email.split('@')[0];
       
       if (profileName) profileName.textContent = displayName;
-      if (profileEmail) profileEmail.textContent = user.email;
+      if (profileEmail) profileEmail.textContent = currentUser.email;
       if (profileNameInput) profileNameInput.value = displayName;
       
       if (profileLetter && profileAvatarLarge) {
         profileLetter.textContent = displayName[0].toUpperCase();
-        const color = user.profile?.avatarColor || generateColor(displayName);
+        const color = userData.avatarColor || generateColor(displayName);
         profileAvatarLarge.style.background = color;
       }
 
-      if (profileRegistered && user.registeredAt) {
-        const date = new Date(user.registeredAt);
+      if (profileRegistered && userData.registeredAt) {
+        const date = new Date(userData.registeredAt);
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         const lang = localStorage.getItem('site_lang') || 'en';
         const locale = lang === 'ua' || lang === 'uk' ? 'uk-UA' : 'en-US';
@@ -2007,11 +2006,7 @@ function applyLang(lang) {
           languageDropdownMenu.classList.remove('open');
 
           applyFullLanguage(selectedLang);
-
-          updateCurrentUserData(user => {
-            if (!user.profile) user.profile = {};
-            user.profile.language = selectedLang;
-          });
+          updateCurrentUserData({ language: selectedLang });
 
           const aiChat = document.getElementById('aiChat');
           if (aiChat) {
@@ -2078,10 +2073,11 @@ function applyLang(lang) {
 
     updateUIForUser(true);
 
-    const userEmail = getCurrentUser();
-    if (userEmail) {
-      loadUserTasks();
-    }
+    getCurrentUser().then(user => {
+      if (user) {
+        loadUserTasks();
+      }
+    });
 
     if (logoutBtn) {
       logoutBtn.addEventListener('click', () => {
@@ -3031,11 +3027,9 @@ function applyLang(lang) {
 
     window.updateDashboardStats = updateDashboardStats;
 
-    window.handleDelete = function(taskId) {
+    window.handleDelete = async function(taskId) {
       if (confirm('Are you sure you want to delete this task?')) {
-        updateCurrentUserData(user => {
-          user.tasks = user.tasks.filter(t => t.id !== taskId);
-        });
+        await supabaseClient.from('tasks').delete().eq('id', taskId);
         
         const row = document.querySelector(`tr[data-id="${taskId}"]`);
         if (row) row.remove();
@@ -3054,21 +3048,21 @@ function applyLang(lang) {
     };
 
     window.handleDuplicate = function(taskId) {
-      const user = getCurrentUserData();
-      const originalTask = user.tasks.find(t => t.id === taskId);
+      const { data: originalTask } = await supabaseClient.from('tasks').select('*').eq('id', taskId).single();
       if (!originalTask) return;
 
-        const newTask = {
-            ...originalTask,
-            id: 'task-' + Date.now(),
-            name: originalTask.name + ' (copy)'
-        };
+      const newTask = {
+          ...originalTask,
+          id: 'task-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+          name: originalTask.name + ' (copy)'
+      };
+      
+      delete newTask.createdAt;
 
-        saveTask(newTask);
-        
-        const originalRow = document.querySelector(`tr[data-id="${taskId}"]`);
-        
-        renderTask(newTask, originalRow.nextSibling);
+      await saveTask(newTask);
+      
+      const originalRow = document.querySelector(`tr[data-id="${taskId}"]`);
+      renderTask(newTask, originalRow.nextSibling);
       
       removeAllMenus();
     };

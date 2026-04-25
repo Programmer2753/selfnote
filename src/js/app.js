@@ -1052,7 +1052,7 @@ function applyLang(lang) {
   let selectedDate = null;
   let selectedDateForTask = null;
 
-  function renderQuickCalendarContent() {
+  async function renderQuickCalendarContent() {
     const grid = document.getElementById('quickCalendarGrid');
     const title = document.getElementById('quickMonthTitle');
     if (!grid || !title) return;
@@ -1084,7 +1084,7 @@ function applyLang(lang) {
         const div = document.createElement('div');
         const isToday = d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
         
-        const user = getCurrentUserData();
+        const user = await getCurrentUserData();
         const currentTask = user.tasks.find(t => t.id === activeTaskIdForQuickDate);
         const isSelected = currentTask && currentTask.date === `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 
@@ -1134,7 +1134,12 @@ function applyLang(lang) {
       .from('users')
       .select('*')
       .eq('email', email)
-      .single(); // Ожидаем только одну запись
+      .maybeSingle();
+    
+    if (!data) {
+      logout(); 
+      return null;
+    }
 
     if (error) {
       console.error('Ошибка получения данных:', error.message);
@@ -1246,21 +1251,21 @@ function applyLang(lang) {
     subMenu.onmouseleave = () => subMenu.remove();
   }
 
-  function saveTask(task) {
-    const user = getCurrentUser();
+  async function saveTask(task) {
+    const user = await getCurrentUser();
     if (!user) {
       console.error('NO USER');
       showNotification('User not logged in', 'error');
       return;
     }
 
-    updateCurrentUserData(user => {
+    await updateCurrentUserData(user => {
       user.tasks.push(task);
     });
   }
 
-  function updateTask(id, changes) {
-    updateCurrentUserData(user => {
+  async function updateTask(id, changes) {
+    await updateCurrentUserData(user => {
       const task = user.tasks.find(t => t.id === id);
       if (!task) return;
       Object.assign(task, changes);
@@ -1449,7 +1454,7 @@ function applyLang(lang) {
     return `${year}-${month}-${day}`;
   }
 
-  function selectDate(dateStr) {
+  async function selectDate(dateStr) {
     selectedDate = dateStr;
       
     document.querySelectorAll('.calendar-day').forEach(day => day.classList.remove('selected'));
@@ -1465,17 +1470,17 @@ function applyLang(lang) {
         activeTaskIdForDate = null;
     }
 
-    displayTasksForDate(dateStr);
+    await displayTasksForDate(dateStr);
   }
 
-  function getTasksForDate(dateStr) {
-    const user = getCurrentUserData();
+  async function getTasksForDate(dateStr) {
+    const user = await getCurrentUserData();
     if (!user || !user.tasks) return [];
       
     return user.tasks.filter(task => task.date === dateStr);
   }
 
-  function displayTasksForDate(dateStr) {
+  async function displayTasksForDate(dateStr) {
     const selectedDateTitle = document.getElementById('selectedDateTitle');
     const dateTasksList = document.getElementById('dateTasksList');
     const addTaskForDateBtn = document.getElementById('addTaskForDateBtn');
@@ -1492,7 +1497,7 @@ function applyLang(lang) {
     addTaskForDateBtn.style.display = 'flex';
     addTaskForDateBtn.innerHTML = `<span style="font-size: 20px; margin-right: 4px;"></span> ${t.calendar?.addTaskBtn || '+ Add task'}`;
 
-    const tasks = getTasksForDate(dateStr);
+    const tasks = await getTasksForDate(dateStr);
       
     if (tasks.length === 0) {
       const currentLang = localStorage.getItem('site_lang') || 'en';

@@ -1122,8 +1122,9 @@ function applyLang(lang) {
     return s === 'DONE' ? 'dot-done' : s === 'IN PROGRESS' ? 'dot-progress' : 'dot-todo';
   }
 
-  function getCurrentUser() {
-    return localStorage.getItem('currentUser');
+  async function getCurrentUser() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    return session ? session.user : null;
   }
 
   async function getCurrentUserData() {
@@ -1253,64 +1254,56 @@ function applyLang(lang) {
 
   async function saveTask(task) {
     const user = await getCurrentUser();
-    if (!user) {
-      console.error('NO USER');
-      showNotification('User not logged in', 'error');
-      return;
-    }
+    if (!user) return showNotification('User not logged in', 'error');
 
-    await updateCurrentUserData(user => {
-      user.tasks.push(task);
-    });
-  }
-
-  async function updateTask(id, changes) {
-    await updateCurrentUserData(user => {
-      const task = user.tasks.find(t => t.id === id);
-      if (!task) return;
-      Object.assign(task, changes);
-    });
-  }
-
-  async function saveUser(email, password) {
     const { data, error } = await supabaseClient
-      .from('users')
-      .insert([
-        { 
-          email: email, 
-          password: password, // Важно: в реальных проектах пароли хэшируют! 
-          name: getEmailName(email) 
-        }
-      ])
-      .select(); // Просим вернуть созданную запись
+      .from('tasks')
+      .insert([{ 
+        ...task, 
+        user_id: user.id
+      }]);
+
+    if (error) console.error('Save error:', error.message);
+  }
+
+  async function updateTask(taskId, changes) {
+    const { error } = await supabaseClient
+      .from('tasks')
+      .update(changes)
+      .eq('id', taskId);
+  }
+
+  async function saveUser(email, password, name) {
+    const { data, error } = await supabaseClient.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: { name: name }
+      }
+    });
 
     if (error) {
-      console.error('Ошибка при регистрации:', error.message);
+      console.error('Registration error:', error.message);
       return null;
     }
-    return data[0];
+    return data.user;
   }
 
-  async function findUser(email, password) {
-    const { data, error } = await supabaseClient
-      .from('users')
-      .select('*')
-      .eq('email', email)
-      .eq('password', password);
+  async function loginUser(email, password) {
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
 
-    if (error || data.length === 0) {
-      console.error('Неверный логин или пароль');
+    if (error) {
+      console.error('Incorrect username or password:', error.message);
       return null;
     }
-    return data[0]; // Возвращаем найденного пользователя
+    return data.user;
   }
 
-  function setCurrentUser(email) {
-    localStorage.setItem('currentUser', email);
-  }
-
-  function logout() {
-    localStorage.removeItem('currentUser');
+  async function logout() {
+    await supabaseClient.auth.signOut();
   }
 
   function getEmailName(email) {
@@ -1474,10 +1467,14 @@ function applyLang(lang) {
   }
 
   async function getTasksForDate(dateStr) {
-    const user = await getCurrentUserData();
-    if (!user || !user.tasks) return [];
+    const user = await getCurrentUser();
+    const { data, error } = await supabaseClient
+      .from('tasks')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('date', dateStr);
       
-    return user.tasks.filter(task => task.date === dateStr);
+    return data || [];
   }
 
   async function displayTasksForDate(dateStr) {
@@ -1787,20 +1784,30 @@ function applyLang(lang) {
     }
   }
 
-  function loadUserTasks() {
-    const user = getCurrentUserData();
-    if (!user || !user.tasks) return;
+  async function loadUserTasks() {
+    const user = await getCurrentUser();
+    if (!user) return;
+
+    const { data: tasks, error } = await supabaseClient
+      .from('tasks')
+      .select('*')
+      .eq('user_id', user.id);
+
+    if (error) {
+      console.error('Ошибка при загрузке задач:', error.message);
+      return;
+    }
 
     document
       .querySelectorAll('.table tbody tr:not(.group-row):not(.add-task-row)')
       .forEach(r => r.remove());
 
-    user.tasks.forEach(task => {
-      const addRow = document.querySelector(
-        `.add-task-row[data-status="${task.status}"]`
-      );
-      renderTask(task, addRow);
-    });
+    if (tasks && tasks.length > 0) {
+      tasks.forEach(task => {
+        const addRow = document.querySelector(`.add-task-row[data-status="${task.status}"]`);
+        renderTask(task, addRow);
+      });
+    }
   }
 
   window.addEventListener('DOMContentLoaded', () => {
@@ -2301,7 +2308,7 @@ function applyLang(lang) {
     }
 
     if (registerButton) {
-      registerButton.addEventListener('click', (e) => {
+      registerButton.addEventListener('click', async (e) => {
         e.preventDefault();
         const email = $('#regEmail')?.value;
         const password = $('#regPassword')?.value;
@@ -2319,33 +2326,31 @@ function applyLang(lang) {
           return;
         }
 
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        if (users.find(u => u.email === email)) {
+        const user = await saveUser(email, password, getEmailName(email));
+        
+        if (user) {
+          await supabaseClient.from('users').insert([{
+            id: user.id,
+            email: email,
+            name: getEmailName(email)
+          }]);
+
           const t = i18n[localStorage.getItem('site_lang') || 'en'];
-          showNotification(t.notifications.userExists, 'error');
-          return;
+          showNotification(t.notifications.registerSuccess(getEmailName(email)), 'success');
+          
+          $('#regEmail').value = '';
+          $('#regPassword').value = '';
+          $('#regConfirmPassword').value = '';
+          
+          updateUIForUser();
+          loadUserTasks();
+          closeOverlay(document.querySelector('.modal-overlay-start'));
         }
-
-        saveUser(email, password);
-        setCurrentUser(email);
-        loadUserTasks();
-        window.location.href = '/index';
-
-        const t = i18n[localStorage.getItem('site_lang') || 'en'];
-        showNotification(t.notifications.registerSuccess(getEmailName(email)), 'success');
-        
-        $('#regEmail').value = '';
-        $('#regPassword').value = '';
-        $('#regConfirmPassword').value = '';
-        
-        updateUIForUser();
-        
-        closeOverlay(modalStart);
       });
     }
 
     if (loginButton) {
-      loginButton.addEventListener('click', (e) => {
+      loginButton.addEventListener('click', async (e) => {
         e.preventDefault();
         const email = $('#loginEmail')?.value;
         const password = $('#loginPassword')?.value;
@@ -2356,15 +2361,12 @@ function applyLang(lang) {
           return;
         }
 
-        const user = findUser(email, password);
+        const user = await loginUser(email, password);
         if (!user) {
           const t = i18n[localStorage.getItem('site_lang') || 'en'];
           showNotification(t.notifications.loginError, 'error');
           return;
         }
-
-        setCurrentUser(email);
-        loadUserTasks();
 
         const t = i18n[localStorage.getItem('site_lang') || 'en'];
         showNotification(t.notifications.loginSuccess(getEmailName(email)), 'success');
@@ -2373,8 +2375,8 @@ function applyLang(lang) {
         $('#loginPassword').value = '';
         
         updateUIForUser();
-        
-        closeOverlay(modalLog);
+        loadUserTasks();
+        closeOverlay(document.querySelector('.modal-overlay-log'));
       });
     }
 
@@ -2938,23 +2940,16 @@ function applyLang(lang) {
       initAIGreeting();
     }
 
-    function updateDashboardStats() {
-      const tasks = [];
-      const rows = document.querySelectorAll('.table tbody tr:not(.group-row):not([class*="add-task"])');
-      
-      rows.forEach(row => {
-        const nameCell = row.querySelector('.name-cell');
-        const statusCell = row.querySelector('.status');
-        const priorityBtn = row.querySelector('.priority-btn');
+    async function updateDashboardStats() {
+      const user = await getCurrentUser();
+      if (!user) return;
 
-        if (!nameCell || !statusCell) return;
+      const { data: tasks, error } = await supabaseClient
+        .from('tasks')
+        .select('*')
+        .eq('user_id', user.id);
 
-        tasks.push({
-          name: nameCell.textContent.trim(),
-          status: statusCell.textContent.trim(),
-          priority: priorityBtn?.dataset.priority || ''
-        });
-      });
+      if (error || !tasks) return;
 
       const totalTasks = tasks.length;
       const inProgress = tasks.filter(t => t.status === 'IN PROGRESS').length;
@@ -3121,19 +3116,13 @@ function applyLang(lang) {
       input.onblur = saveName;
     };
 
-
-    window.deleteTask = function(taskId) {
+    window.deleteTask = async function(taskId) {
       if (!confirm('Видалити цю задачу?')) return;
       
-      updateCurrentUserData(user => {
-        user.tasks = user.tasks.filter(t => t.id !== taskId);
-      });
+      await supabaseClient.from('tasks').delete().eq('id', taskId);
       
-      if (selectedDate) {
-        displayTasksForDate(selectedDate);
-        renderCalendar();
-      }
-      
+      const row = document.querySelector(`tr[data-id="${taskId}"]`);
+      if (row) row.remove();
       showNotification('Задачу видалено', 'success');
     };
 

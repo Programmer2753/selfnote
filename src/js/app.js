@@ -2325,12 +2325,6 @@ function applyLang(lang) {
         const user = await saveUser(email, password, getEmailName(email));
         
         if (user) {
-          await supabaseClient.from('users').insert([{
-            id: user.id,
-            email: email,
-            name: getEmailName(email)
-          }]);
-
           const t = i18n[localStorage.getItem('site_lang') || 'en'];
           showNotification(t.notifications.registerSuccess(getEmailName(email)), 'success');
           
@@ -2866,15 +2860,17 @@ function applyLang(lang) {
         }
       }, 2000);
 
-      const allUsers = JSON.parse(localStorage.getItem('users') || '[]');
-      const currentUserEmail = localStorage.getItem('currentUser');
       let userTasks = [];
-      if (currentUserEmail) {
-        const currentUser = allUsers.find(u => u.email === currentUserEmail);
-        if (currentUser && currentUser.tasks) {
-          userTasks = currentUser.tasks.map(t => 
-            typeof t === 'object' ? (t.name || t.text || JSON.stringify(t)) : t
-          );
+      const currentUser = await getCurrentUser();
+      
+      if (currentUser) {
+        const { data: tasks, error } = await supabaseClient
+          .from('tasks')
+          .select('name')
+          .eq('user_id', currentUser.id);
+          
+        if (tasks && !error) {
+          userTasks = tasks.map(t => t.name);
         }
       }
 

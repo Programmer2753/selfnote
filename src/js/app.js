@@ -3038,16 +3038,16 @@ function applyLang(lang) {
       }
     };
 
-    window.handleUpdateType = function(taskId, type) {
+    window.handleUpdateType = async function(taskId, type) {
       const row = document.querySelector(`tr[data-id="${taskId}"]`);
       if (row) {
         setTaskType(row, type);
-        updateTask(taskId, { type: type });
+        await updateTask(taskId, { type: type });
       }
       removeAllMenus();
     };
 
-    window.handleDuplicate = function(taskId) {
+    window.handleDuplicate = async function(taskId) {
       const { data: originalTask } = await supabaseClient.from('tasks').select('*').eq('id', taskId).single();
       if (!originalTask) return;
 

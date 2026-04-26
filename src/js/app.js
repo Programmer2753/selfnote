@@ -1245,31 +1245,28 @@ function applyLang(lang) {
   }
 
   async function saveTask(task) {
-    const { data, error } = await supabaseClient.auth.signUp({
-      email: email,
-      password: password,
-      options: {
-        data: { name: name }
-      }
-    });
+    const user = await getCurrentUser();
+
+    if (!user) {
+      console.error('User not logged in');
+      return;
+    }
+
+    const { data, error } = await supabaseClient
+      .from('tasks')
+      .insert([{ 
+        id: task.id,
+        user_id: user.id,
+        name: task.name,
+        status: task.status,
+        type: task.type || 'task',
+        priority: task.priority || 'none',
+        date: task.date || null
+      }]);
 
     if (error) {
-      console.error('Registration error:', error.message);
-      return { user: null, error: error.message };
+      console.error('Ошибка при сохранении задачи:', error.message);
     }
-
-    if (data.user) {
-      const { error: insertError } = await supabaseClient
-        .from('users')
-        .insert([{ 
-          id: data.user.id, 
-          name: name,
-        }]);
-        
-      if (insertError) console.error('Error adding to users table:', insertError.message);
-    }
-
-    return { user: data.user, error: null };
   }
 
   async function updateTask(taskId, changes) {
@@ -1290,6 +1287,7 @@ function applyLang(lang) {
 
     if (error) {
       console.error('Registration error:', error.message);
+      showNotification(error.message, 'error');
       return null;
     }
     return data.user;
@@ -1885,8 +1883,15 @@ function applyLang(lang) {
 
     async function openProfileModal() {
       const currentUser = await getCurrentUser();
-      const userData = await getCurrentUserData();
-      if (!currentUser || !userData) return;
+      if (!currentUser) return;
+
+      let userData = await getCurrentUserData();
+      if (!userData) {
+        userData = { 
+          name: currentUser.email.split('@')[0],
+          avatarColor: generateColor(currentUser.email)
+        };
+      }
 
       const { data: tasks } = await supabaseClient
         .from('tasks')

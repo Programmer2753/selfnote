@@ -1080,20 +1080,28 @@ function applyLang(lang) {
     }
 
     const today = new Date();
+    let currentTaskDate = null;
+    if (activeTaskIdForQuickDate) {
+      const { data: taskData } = await supabaseClient
+        .from('tasks')
+        .select('date')
+        .eq('id', activeTaskIdForQuickDate)
+        .maybeSingle();
+        
+      if (taskData) currentTaskDate = taskData.date;
+    }
+
     for (let d = 1; d <= lastDay.getDate(); d++) {
         const div = document.createElement('div');
         const isToday = d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
-        
-        const user = await getCurrentUserData();
-        const currentTask = user.tasks.find(t => t.id === activeTaskIdForQuickDate);
-        const isSelected = currentTask && currentTask.date === `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const loopDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const isSelected = currentTaskDate === loopDateStr;
 
         div.className = `quick-day ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''}`;
         div.textContent = d;
         
         div.onclick = () => {
-            const selectedDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-            applyDateToTask(selectedDate);
+            applyDateToTask(loopDateStr);
         };
         grid.appendChild(div);
     }

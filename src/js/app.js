@@ -1245,17 +1245,31 @@ function applyLang(lang) {
   }
 
   async function saveTask(task) {
-    const user = await getCurrentUser();
-    if (!user) return showNotification('User not logged in', 'error');
+    const { data, error } = await supabaseClient.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: { name: name }
+      }
+    });
 
-    const { data, error } = await supabaseClient
-      .from('tasks')
-      .insert([{ 
-        ...task, 
-        user_id: user.id
-      }]);
+    if (error) {
+      console.error('Registration error:', error.message);
+      return { user: null, error: error.message };
+    }
 
-    if (error) console.error('Save error:', error.message);
+    if (data.user) {
+      const { error: insertError } = await supabaseClient
+        .from('users')
+        .insert([{ 
+          id: data.user.id, 
+          name: name,
+        }]);
+        
+      if (insertError) console.error('Error adding to users table:', insertError.message);
+    }
+
+    return { user: data.user, error: null };
   }
 
   async function updateTask(taskId, changes) {
@@ -1288,10 +1302,10 @@ function applyLang(lang) {
     });
 
     if (error) {
-      console.error('Incorrect username or password:', error.message);
-      return null;
+      console.error('Login error:', error.message);
+      return { user: null, error: error.message };
     }
-    return data.user;
+    return { user: data.user, error: null };
   }
 
   async function logout() {
@@ -2309,30 +2323,33 @@ function applyLang(lang) {
         const email = $('#regEmail')?.value;
         const password = $('#regPassword')?.value;
         const confirmPassword = $('#regConfirmPassword')?.value;
+        const t = i18n[localStorage.getItem('site_lang') || 'en'];
         
         if (!email || !password || !confirmPassword) {
-          const t = i18n[localStorage.getItem('site_lang') || 'en'];
           showNotification(t.notifications.fillAll, 'error');
           return;
         }
 
         if (password !== confirmPassword) {
-          const t = i18n[localStorage.getItem('site_lang') || 'en'];
           showNotification(t.notifications.passwordsMismatch, 'error');
           return;
         }
 
-        const user = await saveUser(email, password, getEmailName(email));
+        const { user, error } = await saveUser(email, password, getEmailName(email));
         
+        if (error) {
+          showNotification(error, 'error'); 
+          return;
+        }
+
         if (user) {
-          const t = i18n[localStorage.getItem('site_lang') || 'en'];
           showNotification(t.notifications.registerSuccess(getEmailName(email)), 'success');
           
           $('#regEmail').value = '';
           $('#regPassword').value = '';
           $('#regConfirmPassword').value = '';
           
-          updateUIForUser();
+          await updateUIForUser();
           loadUserTasks();
           closeOverlay(document.querySelector('.modal-overlay-start'));
         }
@@ -2344,27 +2361,26 @@ function applyLang(lang) {
         e.preventDefault();
         const email = $('#loginEmail')?.value;
         const password = $('#loginPassword')?.value;
+        const t = i18n[localStorage.getItem('site_lang') || 'en'];
 
         if (!email || !password) {
-          const t = i18n[localStorage.getItem('site_lang') || 'en'];
           showNotification(t.notifications.fillAll, 'error');
           return;
         }
 
-        const user = await loginUser(email, password);
-        if (!user) {
-          const t = i18n[localStorage.getItem('site_lang') || 'en'];
-          showNotification(t.notifications.loginError, 'error');
+        const { user, error } = await loginUser(email, password);
+        
+        if (error) {
+          showNotification(error === 'Email not confirmed' ? error : t.notifications.loginError, 'error');
           return;
         }
 
-        const t = i18n[localStorage.getItem('site_lang') || 'en'];
         showNotification(t.notifications.loginSuccess(getEmailName(email)), 'success');
         
         $('#loginEmail').value = '';
         $('#loginPassword').value = '';
         
-        updateUIForUser();
+        await updateUIForUser();
         loadUserTasks();
         closeOverlay(document.querySelector('.modal-overlay-log'));
       });

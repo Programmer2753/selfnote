@@ -1727,6 +1727,10 @@ nav a:hover,
     border-color: #3a3a3c;
 }
 
+.stat-card:hover .stat-icon img {
+    opacity: 0.9;
+}
+
 .stat-icon {
     width: 64px;
     height: 64px;
@@ -1736,6 +1740,13 @@ nav a:hover,
     justify-content: center;
     font-size: 28px;
     flex-shrink: 0;
+}
+
+.stat-icon img {
+    width: 64px;
+    height: 64px;
+    opacity: 0.8;
+    transition: all 0.3s;
 }
 
 .stat-content {
@@ -1856,6 +1867,10 @@ nav a:hover,
 }
 
 .priority-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     font-size: 15px;
     font-weight: 500;
     color: #e6e6e6;
@@ -1920,13 +1935,17 @@ nav a:hover,
 .activity-icon {
     width: 40px;
     height: 40px;
-    background: #3b82f6;
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 20px;
     flex-shrink: 0;
+}
+
+.activity-icon img {
+    width: 32px;
+    height: 32px;
 }
 
 .activity-content {

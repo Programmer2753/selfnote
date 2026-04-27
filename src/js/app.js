@@ -2379,6 +2379,31 @@ function applyLang(lang) {
       });
     }
 
+    const googleButtons = document.querySelectorAll('.google-btn');
+    googleButtons.forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const t = i18n[localStorage.getItem('site_lang') || 'en'];
+        
+        try {
+          const { data, error } = await supabaseClient.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+              redirectTo: window.location.origin 
+            }
+          });
+
+          if (error) {
+            console.error('Google auth error:', error.message);
+            showNotification(translateSupabaseError(error.message), 'error');
+          }
+
+        } catch (err) {
+          console.error('Unexpected error during Google login:', err);
+        }
+      });
+    });
+
     if (registerButton) {
       registerButton.addEventListener('click', async (e) => {
         e.preventDefault();
@@ -3097,11 +3122,15 @@ function applyLang(lang) {
 
     window.handleDelete = async function(taskId) {
       if (confirm('Are you sure you want to delete this task?')) {
-        await supabaseClient.from('tasks').delete().eq('id', taskId);
+        const { error } = await supabaseClient.from('tasks').delete().eq('id', taskId);
+
+        if (error) {
+          showNotification('Error during deletion', 'error');
+          return;
+        }
         
         const row = document.querySelector(`tr[data-id="${taskId}"]`);
         if (row) row.remove();
-        
         removeAllMenus();
       }
     };

@@ -522,13 +522,13 @@
                         </div>
                         
                         <div class="calendar-weekdays">
-                            <div class="weekday">Пн</div>
-                            <div class="weekday">Вт</div>
-                            <div class="weekday">Ср</div>
-                            <div class="weekday">Чт</div>
-                            <div class="weekday">Пт</div>
-                            <div class="weekday">Сб</div>
-                            <div class="weekday">Нд</div>
+                            <div class="weekday">Mon</div>
+                            <div class="weekday">Tue</div>
+                            <div class="weekday">Wed</div>
+                            <div class="weekday">Thu</div>
+                            <div class="weekday">Fri</div>
+                            <div class="weekday">Sat</div>
+                            <div class="weekday">Sun</div>
                         </div>
                         
                         <div class="calendar-grid" id="calendarGrid">
@@ -537,15 +537,15 @@
                     
                     <div class="selected-date-tasks" id="selectedDateTasks">
                         <div class="tasks-header">
-                            <h3 id="selectedDateTitle">Виберіть дату</h3>
+                            <h3 id="selectedDateTitle">Select a Date</h3>
                             <button class="add-task-for-date-btn" id="addTaskForDateBtn" style="display: none;">
-                                + Додати план
+                                + Add Task
                             </button>
                         </div>
                         <div class="date-tasks-list" id="dateTasksList">
                             <div class="empty-state">
                                 <div class="empty-icon">📅</div>
-                                <p>Виберіть дату, щоб побачити заплановані справи</p>
+                                <p>Select a date to see planned tasks</p>
                             </div>
                         </div>
                     </div>
@@ -554,60 +554,60 @@
                 <div class="dashboard-view" id="boardView" style="display: none;">
                     <div class="dashboard-container">
                         <div class="dashboard-header">
-                            <h1>Огляд панелі</h1>
-                            <p class="dashboard-subtitle">Огляд ваших проєктів та завдань</p>
+                            <h1>Dashboard</h1>
+                            <p class="dashboard-subtitle">Overview of your projects and tasks</p>
                         </div>
 
                         <div class="stats-grid">
                             <div class="stat-card">
-                                <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                                    📋
+                                <div class="stat-icon">
+                                    <img src="assets/images/alltasks.png">
                                 </div>
                                 <div class="stat-content">
                                     <h3 class="stat-value" id="totalTasks">0</h3>
-                                    <p class="stat-label">Всього завдань</p>
+                                    <p class="stat-label">Total Tasks</p>
                                 </div>
                             </div>
 
                             <div class="stat-card">
-                                <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                                    🔄
+                                <div class="stat-icon">
+                                    <img src="assets/images/inprogress.png">
                                 </div>
                                 <div class="stat-content">
                                     <h3 class="stat-value" id="inProgressTasks">0</h3>
-                                    <p class="stat-label">У процесі</p>
+                                    <p class="stat-label">In Progress</p>
                                 </div>
                             </div>
 
                             <div class="stat-card">
-                                <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                                    ✅
+                                <div class="stat-icon">
+                                    <img src="assets/images/completed.png">
                                 </div>
                                 <div class="stat-content">
                                     <h3 class="stat-value" id="completedTasks">0</h3>
-                                    <p class="stat-label">Завершено</p>
+                                    <p class="stat-label">Completed</p>
                                 </div>
                             </div>
 
                             <div class="stat-card">
-                                <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-                                    📈
+                                <div class="stat-icon">
+                                    <img src="assets/images/productivity.png">
                                 </div>
                                 <div class="stat-content">
                                     <h3 class="stat-value" id="productivity">0%</h3>
-                                    <p class="stat-label">Продуктивність</p>
+                                    <p class="stat-label">Productivity</p>
                                 </div>
                             </div>
                         </div>
 
                         <div class="charts-row">
                             <div class="chart-card">
-                                <h3 class="chart-title">Прогрес завдань</h3>
+                                <h3 class="chart-title">Task Progress</h3>
                                 <div class="progress-chart">
                                     <div class="progress-bar-container">
                                         <div class="progress-item">
                                             <div class="progress-label">
-                                                <span>ЗРОБИТИ</span>
+                                                <span>TO DO</span>
                                                 <span id="todoCount">0</span>
                                             </div>
                                             <div class="progress-bar">
@@ -616,7 +616,7 @@
                                         </div>
                                         <div class="progress-item">
                                             <div class="progress-label">
-                                                <span>У ПРОЦЕСІ</span>
+                                                <span>IN PROGRESS</span>
                                                 <span id="progressCount">0</span>
                                             </div>
                                             <div class="progress-bar">
@@ -625,7 +625,7 @@
                                         </div>
                                         <div class="progress-item">
                                             <div class="progress-label">
-                                                <span>ВИКОНАНО</span>
+                                                <span>DONE</span>
                                                 <span id="doneCount">0</span>
                                             </div>
                                             <div class="progress-bar">
@@ -637,23 +637,23 @@
                             </div>
 
                             <div class="chart-card">
-                                <h3 class="chart-title">Пріоритети</h3>
+                                <h3 class="chart-title">Priorities</h3>
                                 <div class="priority-chart">
                                     <div class="priority-list">
                                         <div class="priority-item">
-                                            <div class="priority-badge urgent">🔴 Терміново</div>
+                                            <div class="priority-badge urgent"></div>
                                             <div class="priority-count" id="urgentCount">0</div>
                                         </div>
                                         <div class="priority-item">
-                                            <div class="priority-badge high">🟡 Високий</div>
+                                            <div class="priority-badge high"></div>
                                             <div class="priority-count" id="highCount">0</div>
                                         </div>
                                         <div class="priority-item">
-                                            <div class="priority-badge medium">🔵 Звичайний</div>
+                                            <div class="priority-badge medium"></div>
                                             <div class="priority-count" id="mediumCount">0</div>
                                         </div>
                                         <div class="priority-item">
-                                            <div class="priority-badge low">⚪ Низький</div>
+                                            <div class="priority-badge low"></div>
                                             <div class="priority-count" id="lowCount">0</div>
                                         </div>
                                     </div>
@@ -662,13 +662,13 @@
                         </div>
 
                         <div class="recent-activity">
-                            <h3 class="activity-title">Останні завдання</h3>
+                            <h3 class="activity-title">Recent Tasks</h3>
                             <div class="activity-list" id="recentTasks">
                                 <div class="activity-item">
-                                    <div class="activity-icon">📝</div>
+                                    <div class="activity-icon"><img src="assets/images/recent_icon.png"></div>
                                     <div class="activity-content">
-                                        <p class="activity-text">Поки немає завдань. Створіть своє перше завдання!</p>
-                                        <span class="activity-time">Зараз</span>
+                                        <p class="activity-text">No tasks yet. Create your first task!</p>
+                                        <span class="activity-time">Now</span>
                                     </div>
                                 </div>
                             </div>

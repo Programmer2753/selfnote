@@ -46,6 +46,15 @@ const i18n = {
       resetSent: "Password reset email has been sent"
     },
 
+    authErrors: {
+      weakPassword: "Password should be at least 6 characters",
+      userAlreadyExists: "User already registered",
+      invalidEmail: "Invalid email address",
+      invalidCredentials: "Invalid login credentials",
+      rateLimit: "Too many requests. Please try again later",
+      emailNotConfirmed: "Email not confirmed"
+    },
+
     monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
 
     sidebar: {
@@ -138,7 +147,7 @@ const i18n = {
     },
 
     dashboard: {
-      title: "Dashboard Overview",
+      title: "Dashboard",
       subtitle: "Review of your projects and tasks",
       totalTasks: "Total Tasks",
       inProgress: "In Progress",
@@ -325,6 +334,15 @@ const i18n = {
       resetSent: "На вашу пошту відправлено лист для скидання пароля"
     },
 
+    authErrors: {
+      weakPassword: "Пароль має містити щонайменше 6 символів",
+      userAlreadyExists: "Користувач з таким email вже зареєстрований",
+      invalidEmail: "Неправильна адреса електронної пошти",
+      invalidCredentials: "Невірний email або пароль",
+      rateLimit: "Забагато спроб. Будь ласка, спробуйте пізніше",
+      emailNotConfirmed: "Електронна пошта не підтверджена"
+    },
+
     monthNames: ['Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень', 'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'],
 
     sidebar: {
@@ -417,7 +435,7 @@ const i18n = {
     },
 
     dashboard: {
-      title: "Огляд панелі",
+      title: "Дашборд",
       subtitle: "Огляд ваших проєктів та завдань",
       totalTasks: "Всього завдань",
       inProgress: "У процесі",
@@ -549,6 +567,15 @@ const i18n = {
       resetSent: "Письмо для сброса пароля отправлено"
     },
 
+    authErrors: {
+      weakPassword: "Пароль должен содержать минимум 6 символов",
+      userAlreadyExists: "Пользователь с таким email уже зарегистрирован",
+      invalidEmail: "Неверный адрес электронной почты",
+      invalidCredentials: "Неверный email или пароль",
+      rateLimit: "Слишком много попыток. Пожалуйста, попробуйте позже",
+      emailNotConfirmed: "Email не подтвержден"
+    },
+
     monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
 
     sidebar: {
@@ -641,7 +668,7 @@ const i18n = {
     },
 
     dashboard: {
-      title: "Обзор дашборда",
+      title: "Дашборд",
       subtitle: "Обзор ваших проектов и задач",
       totalTasks: "Всего задач",
       inProgress: "В процессе",
@@ -730,6 +757,25 @@ const i18n = {
 const supabaseUrl = 'https://upchtijmzobyirjqidts.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwY2h0aWptem9ieWlyanFpZHRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwMTgzODUsImV4cCI6MjA5MjU5NDM4NX0.p65ieyqaG8FLXlfYHbRw3rtO_Dw6o-_JmRrO2trR-Rg';
 const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+function translateSupabaseError(errorMsg) {
+  if (!errorMsg) return 'Unknown error';
+  
+  const lang = localStorage.getItem('site_lang') || 'en';
+  if (!i18n[lang] || !i18n[lang].authErrors) return errorMsg; 
+
+  const t = i18n[lang].authErrors;
+  const msgLower = errorMsg.toLowerCase();
+
+  if (msgLower.includes('at least 6 characters')) return t.weakPassword;
+  if (msgLower.includes('already registered')) return t.userAlreadyExists;
+  if (msgLower.includes('validate email')) return t.invalidEmail;
+  if (msgLower.includes('invalid login credentials')) return t.invalidCredentials;
+  if (msgLower.includes('rate limit') || msgLower.includes('too many requests')) return t.rateLimit;
+  if (msgLower.includes('email not confirmed')) return t.emailNotConfirmed;
+
+  return errorMsg; 
+}
 
 function applyFullLanguage(lang) {
   const t = i18n[lang] || i18n['en'];
@@ -946,13 +992,17 @@ function applyFullLanguage(lang) {
   if (progressLabels[2]) progressLabels[2].textContent = t.dashboard?.doneStatus || 'DONE';
 
   const priorityBadges = document.querySelectorAll('.priority-badge');
-  if (priorityBadges[0]) priorityBadges[0].textContent = `🔴 ${t.priorities?.urgent || 'Urgent'}`;
-  if (priorityBadges[1]) priorityBadges[1].textContent = `🟡 ${t.priorities?.high || 'High'}`;
-  if (priorityBadges[2]) priorityBadges[2].textContent = `🔵 ${t.priorities?.normal || 'Normal'}`;
-  if (priorityBadges[3]) priorityBadges[3].textContent = `⚪ ${t.priorities?.low || 'Low'}`;
+  if (priorityBadges[0]) priorityBadges[0].innerHTML = `<img src="assets/images/urgent_icon.png"> ${t.priorities?.urgent || 'Urgent'}`;
+  if (priorityBadges[1]) priorityBadges[1].innerHTML = `<img src="assets/images/high_icon.png"> ${t.priorities?.high || 'High'}`;
+  if (priorityBadges[2]) priorityBadges[2].innerHTML = `<img src="assets/images/normal_icon.png"> ${t.priorities?.normal || 'Normal'}`;
+  if (priorityBadges[3]) priorityBadges[3].innerHTML = `<img src="assets/images/low_icon.png"> ${t.priorities?.low || 'Low'}`;
 
   const activityTitle = document.querySelector('.activity-title');
+  const activityText = document.querySelector('.activity-text');
+  const nowText = document.querySelector('.activity-time');
   if (activityTitle) activityTitle.textContent = t.dashboard?.recentTitle || 'Recent Tasks';
+  if (activityText) activityText.textContent = t.dashboard?.noTasksYet || 'No tasks yet. Create your first task!';
+  if (nowText) nowText.textContent = t.dashboard?.now || 'Now';
 
   setTextSafe('#dateTaskModalTitle', t.calendar?.modalTitle || 'Add Plan');
   setTextSafe('#selectedDateTitle', t.calendar?.selectDate || 'Select Date');
@@ -1273,7 +1323,7 @@ function applyLang(lang) {
       }]);
 
     if (error) {
-      console.error('Ошибка при сохранении задачи:', error.message);
+      console.error('Error saving the task:', error.message);
     }
   }
 
@@ -1295,10 +1345,9 @@ function applyLang(lang) {
 
     if (error) {
       console.error('Registration error:', error.message);
-      showNotification(error.message, 'error');
-      return null;
+      return { user: null, error: error.message };
     }
-    return data.user;
+    return { user: data.user, error: null };
   }
 
   async function loginUser(email, password) {
@@ -2351,7 +2400,7 @@ function applyLang(lang) {
         const { user, error } = await saveUser(email, password, getEmailName(email));
         
         if (error) {
-          showNotification(error, 'error'); 
+          showNotification(translateSupabaseError(error), 'error'); 
           return;
         }
 
@@ -2384,7 +2433,7 @@ function applyLang(lang) {
         const { user, error } = await loginUser(email, password);
         
         if (error) {
-          showNotification(error === 'Email not confirmed' ? error : t.notifications.loginError, 'error');
+          showNotification(translateSupabaseError(error), 'error');
           return;
         }
 
@@ -3023,22 +3072,16 @@ function applyLang(lang) {
           const activityItem = document.createElement('div');
           activityItem.className = 'activity-item';
           
-          let icon = '📝';
-          let bgColor = '#3b82f6';
+          let icon = '<img src="assets/images/alltasks_icon.png">';
           
           if (task.status === 'DONE') {
-            icon = '✅';
-            bgColor = '#10b981';
+            icon = '<img src="assets/images/done_icon.png">';
           } else if (task.status === 'IN PROGRESS') {
-            icon = '🔄';
-            bgColor = '#f59e0b';
-          } else if (task.status === 'BLOCKED') {
-            icon = '🚫';
-            bgColor = '#ef4444';
+            icon = '<img src="assets/images/inprogress_icon.png">';
           }
           
           activityItem.innerHTML = `
-            <div class="activity-icon" style="background: ${bgColor};">${icon}</div>
+            <div class="activity-icon">${icon}</div>
             <div class="activity-content">
               <p class="activity-text">${task.name}</p>
               <span class="activity-time">${task.status}${task.priority ? ' • ' + task.priority : ''}</span>
